@@ -1,9 +1,7 @@
 package template
 
 import (
-	"bufio"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"regexp"
@@ -14,16 +12,10 @@ import (
 const Name = "LexGo"
 
 func OpenCodeFile(filename string) {
-	file, err := os.Open(filename)
+	code, err := os.ReadFile(filename)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer func(file *os.File) {
-		err := file.Close()
-		if err != nil {
-			log.Fatal(err)
-		}
-	}(file)
 
 	regexFile, err := os.ReadFile("in_re.txt")
 	if err != nil {
@@ -31,18 +23,11 @@ func OpenCodeFile(filename string) {
 	}
 	fmt.Printf("About to compile...\n")
 	re := regexp.MustCompile(string(regexFile))
-	bufferedReader := bufio.NewReader(file)
-	fileCopy, err := os.Open(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
-	bReader := bufio.NewReader(fileCopy)
-	runeReader := io.RuneReader(bufferedReader)
 	regex := src.NewRegex(re)
-	Lex(regex, runeReader, bReader)
+	Lex(regex, code)
 }
 
-func Lex(regex *src.Regex, reader io.RuneReader, bReader *bufio.Reader) src.TokenSet {
+func Lex(regex *src.Regex, code []byte) src.TokenSet {
 	//tokens := make([]src.Token, 500)
 	//buffer := make([]byte, 1024)
 
@@ -57,9 +42,12 @@ func Lex(regex *src.Regex, reader io.RuneReader, bReader *bufio.Reader) src.Toke
 		fmt.Printf("%d: %s\n", idx, name)
 	}
 
+	var tokenIDs []string = make([]string, 0)
+	var values [][]byte = make([][]byte, 0)
+
 	fmt.Println("Beginning matching.")
-	match := regex.FindReaderSubmatchIndex(reader)
-	for i := 1; match != nil; i++ {
+	matches := regex.FindAllSubmatchIndex(code)
+	for _, match := range matches {
 		for _, name := range *names {
 			if name == "" {
 				continue
@@ -70,31 +58,16 @@ func Lex(regex *src.Regex, reader io.RuneReader, bReader *bufio.Reader) src.Toke
 			}
 			left, right := match[idx*2], match[idx*2+1]
 			if left != -1 && left != right {
-				fmt.Printf("%d: %s. L:%d; R:%d\n", i, name, left, right)
-				var runeSz int
-				var word []rune
-				for readSoFar := 0; readSoFar < right-left; readSoFar += runeSz {
-					var err error
-					var runeRead rune
-					runeRead, runeSz, err = bReader.ReadRune()
-					if err == io.EOF {
-						break
-					} else if err != nil {
-						log.Panic(err)
-					}
-					word = append(word, runeRead)
-				}
-				fmt.Printf("Word: %s.\n", string(word))
+				value := code[left:right]
+				values = append(values, value)
+				tokenIDs = append(tokenIDs, name)
 				break
-				//fmt.Printf("Read %d bytes: %s\n", runeSz, string(word))
-				//n, err := io.ReadFull(bReader, buffer)
-				//if err != nil {
-				//	return src.TokenSet{}
-				//}
-				//tokens = append(tokens, )
 			}
 		}
-		match = regex.FindReaderSubmatchIndex(reader)
+	}
+	fmt.Println("Result of pattern matching on code text:")
+	for i, value := range values {
+		fmt.Println(tokenIDs[i] + ":    " + string(value))
 	}
 	return src.TokenSet{}
 }

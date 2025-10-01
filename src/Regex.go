@@ -57,6 +57,10 @@ func (re *Regex) FindSubmatchIndex(b []byte) []int {
 	return re.src.FindSubmatchIndex(b)
 }
 
+func (re *Regex) FindAllSubmatchIndex(b []byte) [][]int {
+	return re.src.FindAllSubmatchIndex(b, -1)
+}
+
 func (re *Regex) FindReaderSubmatchIndex(r io.RuneReader) []int {
 	return re.src.FindReaderSubmatchIndex(r)
 }

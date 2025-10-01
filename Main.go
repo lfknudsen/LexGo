@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	//var err error
+	// var err error
 	/*
 		t := NewToken(8, 7, []byte("Hello, my old friend!"), "Test filename", 3, 49)
 		fmt.Println(t.String())
@@ -18,7 +18,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		t.MarshallTo(f)
+		t.Write(f)
 		err = f.Close()
 		if err != nil {
 			log.Fatal(err)
@@ -50,6 +50,6 @@ func main() {
 	}
 	fmt.Printf("%s\n", f)
 	template.OpenCodeFile("code.txt")
-	//regexp := regexp.MustCompile(string(f))
+	// regexp := regexp.MustCompile(string(f))
 
 }

@@ -21,7 +21,7 @@ func (rs *Ruleset) Length() int {
 func (rs *Ruleset) Names() *[]string {
 	names := make([]string, len(rs.Rules))
 	for i, r := range rs.Rules {
-		names[i] = r.id
+		names[i] = r.Id
 	}
 	return &names
 }
@@ -58,11 +58,6 @@ func (rs *Ruleset) Compile() *regexp.Regexp {
 	return regex
 }
 
-func (rs *Ruleset) AddRule(id string, regex string) int {
-	rs.Rules = append(rs.Rules, Rule{id, regexp.MustCompile(regex)})
-	return len(rs.Rules)
-}
-
 // Add appends the given Rule to the Ruleset, and returns the new length of the Ruleset.
 func (rs *Ruleset) Add(rule *Rule) int {
 	rs.Rules = append(rs.Rules, *rule)
@@ -86,7 +81,7 @@ func (rs *Ruleset) AddArray(rules []Rule) int {
 
 func (rs *Ruleset) Remove(id string) int {
 	for i, rule := range rs.Rules {
-		if rule.id == id {
+		if rule.Id == id {
 			rs.Rules = append((rs.Rules)[:i], (rs.Rules)[i+1:]...)
 			return len(rs.Rules)
 		}
@@ -96,7 +91,7 @@ func (rs *Ruleset) Remove(id string) int {
 
 func (rs *Ruleset) RemoveAll(id string) int {
 	for i, rule := range rs.Rules {
-		if rule.id == id {
+		if rule.Id == id {
 			rs.Rules = append((rs.Rules)[:i], (rs.Rules)[i+1:]...)
 		}
 	}
@@ -112,7 +107,7 @@ func Decompile(rx *regexp.Regexp) *Ruleset {
 	fmt.Println("Compiling the regexp for decompiling regexes...")
 	regexOfRegex := regexp.MustCompile(str)
 	searchString := rx.String()
-	//fmt.Println(searchString)
+	// fmt.Println(searchString)
 	matches := regexOfRegex.FindAllStringSubmatchIndex(searchString, -1)
 	if matches == nil {
 		return nil
@@ -129,8 +124,7 @@ func Decompile(rx *regexp.Regexp) *Ruleset {
 		ID := searchString[match[4]:match[5]]
 		RegExp := searchString[match[6]:match[7]]
 		fmt.Printf("Compiling an individual regexp:\n%s: %s\n", ID, RegExp)
-		rex := regexp.MustCompile(RegExp)
-		rules[rulesCount] = Rule{ID, rex}
+		rules[rulesCount] = *NewRule(ID, RegExp)
 		rulesCount++
 	}
 	newRuleset := Ruleset{rules}

@@ -1,17 +1,32 @@
 # This is a single-line comment.
-PKG             package
-TYPE            type
-STRUCT          struct
+PKG(string)                 package
+TYPE(string)                type
+STRUCT(string)              struct
 /* This is a multi-line comment :)
 The strings below look complex, and that's because they are.
 Without negative lookbehind, they have to be :( */
-STRING          "(?:(?:(?:(?:\\")|[^"])|\s)*[^\\])?"
-STRING_SINGLE   '(?:(?:(?:(?:\\')|[^'])|\s)*[^\\])?'
-STRING_BACK     `(?:(?:(?:(?:\\`)|[^`])|\s)*[^\\])?`
-IDENT           \p{L}+
-LBRace          {
-RBRACE          }
+STRING(string)              "(?:(?:(?:(?:\\")|[^"])|\s)*[^\\])?"
+STRING_SINGLE(string)       '(?:(?:(?:(?:\\')|[^'])|\s)*[^\\])?'
+STRING_BACK(string)         `(?:(?:(?:(?:\\`)|[^`])|\s)*[^\\])?`
+IDENT(string)               \p{L}+
+INTEGER(int)                \d+
+FLOAT(float)                \d+(\.\d+)?
+LPAREN(char)                \(
+RPAREN(char)                \)
+LBRace(char)                {
+RBRACE(char)                }
+LBRACKET(char)              \[
+RBRACKET(char)              \]
+OP_PLUS(char)               \+
+OP_MINUS(char)              \-
+OP_MUL(char)                \*
+OP_DIV(char)                \/
+OP_EQ(char)                 \=
+OP_DEQ(string)              \=\=
+COMMENT_LINE_START(char)    \#
+COMMENT_BLOCK_START(string) \/\*
+COMMENT_BLOCK_END(string)   [*][/]
 /* ?: instead of a name means the regex will not be captured.
  So the output of the following will be (?:\s+) */
-?:              \s+
-MISTAKE         .+
+?:(none)                    \s+
+MISTAKE(string)             .+

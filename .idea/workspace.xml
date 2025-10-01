@@ -5,9 +5,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f498c29a-92ff-4873-afd5-6d32d9fd9b48" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/template/LexGo.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Constants.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/bin/Bin.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/bin/BinFileContent.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/bin/BinFileHeader.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/bin/TokenAccepter.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/bin/TokenSet.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/bin/TokenSetHeader.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Expressions/ReadRulesheet.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Expressions/ReadRulesheet.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Main.go" beforeDir="false" afterPath="$PROJECT_DIR$/Main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/in.txt" beforeDir="false" afterPath="$PROJECT_DIR$/in.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/in_re.txt" beforeDir="false" afterPath="$PROJECT_DIR$/in_re.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Bin.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Lex.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lex.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Regex.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/Regex.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Rule.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/Rule.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Ruleset.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/Ruleset.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Token.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/Token.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/template/Lexer.go" beforeDir="false" afterPath="$PROJECT_DIR$/template/Lexer.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -23,22 +38,22 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" url="file://$USER_HOME$/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.1.windows-amd64" />
+  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../Program Files/Go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "lfknudsen"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;lfknudsen&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/lfknudsen/LexGo.git",
-    "accountId": "10c8dfb5-5551-4d2c-8bd7-58e3ee2af6c7"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/lfknudsen/LexGo.git&quot;,
+    &quot;accountId&quot;: &quot;10c8dfb5-5551-4d2c-8bd7-58e3ee2af6c7&quot;
   }
-}]]></component>
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3
 }</component>
@@ -62,7 +77,8 @@
     "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
     "git-widget-placeholder": "main",
     "go.import.settings.migrated": "true",
-    "last_opened_file_path": "E:/repos/LexGo/Expressions",
+    "go.sdk.automatically.set": "true",
+    "last_opened_file_path": "C:/Users/louis/repos/LexGo",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
@@ -76,9 +92,11 @@
       <recent name="E:\repos\GoLex" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\louis\repos\LexGo\src\bin" />
+      <recent name="C:\Users\louis\repos\LexGo\src\bin\tokenset" />
+      <recent name="C:\Users\louis\repos\LexGo\src\bin\binfile" />
       <recent name="E:\repos\LexGo\Template" />
       <recent name="E:\repos\LexGo\Src" />
-      <recent name="E:\repos\LexGo" />
     </key>
   </component>
   <component name="RunManager">
@@ -116,8 +134,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-gosdk-f466f9b0953e-3d2cccfc42a2-org.jetbrains.plugins.go.sharedIndexes.bundled-GO-252.25557.189" />
-        <option value="bundled-js-predefined-d6986cc7102b-b598e85cdad2-JavaScript-GO-252.25557.189" />
+        <option value="bundled-gosdk-f466f9b0953e-3d2cccfc42a2-org.jetbrains.plugins.go.sharedIndexes.bundled-GO-252.25557.175" />
+        <option value="bundled-js-predefined-d6986cc7102b-b598e85cdad2-JavaScript-GO-252.25557.175" />
       </set>
     </attachedChunks>
   </component>

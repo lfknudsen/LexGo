@@ -14,7 +14,7 @@ type Token struct {
 	TotalLength uint16
 	ID          byte
 	Type        TokenType
-	ValueLength byte
+	ValueLength uint16
 	Value       []byte
 	Row         uint32
 	Column      uint32
@@ -32,7 +32,7 @@ func (t *Token) Equals(other Token) bool {
 
 func NewToken(id byte, typ TokenType, value any, filename string, row int, col int) Token {
 	buffer := make([]byte, binary.Size(value))
-	n, err := binary.Encode(buffer, binary.BigEndian, value)
+	n, err := binary.Encode(buffer, BYTE_ORDER, value)
 	if err != nil {
 		panic(err)
 	}
@@ -44,7 +44,7 @@ func NewToken(id byte, typ TokenType, value any, filename string, row int, col i
 	t := Token{
 		ID:          id,
 		Type:        typ,
-		ValueLength: uint8(n),
+		ValueLength: uint16(n),
 		Value:       buffer,
 		Row:         uint32(row),
 		Column:      uint32(col),
@@ -69,56 +69,87 @@ func (t *Token) String() string {
 func (t *Token) Marshall() []byte {
 	bs := make([]byte, t.TotalLength)
 	var buffer = bytes.NewBuffer(bs)
-	_ = binary.Write(buffer, binary.BigEndian, t.TotalLength)
-	_ = binary.Write(buffer, binary.BigEndian, t.ID)
-	_ = binary.Write(buffer, binary.BigEndian, t.Type)
-	_ = binary.Write(buffer, binary.BigEndian, t.ValueLength)
+	_ = binary.Write(buffer, BYTE_ORDER, t.TotalLength)
+	_ = binary.Write(buffer, BYTE_ORDER, t.ID)
+	_ = binary.Write(buffer, BYTE_ORDER, t.Type)
+	_ = binary.Write(buffer, BYTE_ORDER, t.ValueLength)
 	for i := 0; i < len(t.Value); i++ {
-		_ = binary.Write(buffer, binary.BigEndian, t.Value[i])
+		_ = binary.Write(buffer, BYTE_ORDER, t.Value[i])
 	}
-	_ = binary.Write(buffer, binary.BigEndian, t.Row)
-	_ = binary.Write(buffer, binary.BigEndian, t.Column)
+	_ = binary.Write(buffer, BYTE_ORDER, t.Row)
+	_ = binary.Write(buffer, BYTE_ORDER, t.Column)
 	return buffer.Bytes()
 }
 
-func (t *Token) MarshallTo(w io.Writer) {
-	_ = binary.Write(w, binary.BigEndian, t.TotalLength)
-	_ = binary.Write(w, binary.BigEndian, t.ID)
-	_ = binary.Write(w, binary.BigEndian, t.Type)
-	_ = binary.Write(w, binary.BigEndian, t.ValueLength)
-	for i := 0; i < len(t.Value); i++ {
-		_ = binary.Write(w, binary.BigEndian, t.Value[i])
+func (t *Token) Write(w io.Writer) (bytesWritten int) {
+	totalWritten := 0
+	err := binary.Write(w, BYTE_ORDER, t.TotalLength)
+	if err != nil {
+		log.Panic(err)
 	}
-	_ = binary.Write(w, binary.BigEndian, t.Row)
-	_ = binary.Write(w, binary.BigEndian, t.Column)
+	err = binary.Write(w, BYTE_ORDER, t.ID)
+	if err != nil {
+		log.Panic(err)
+	}
+	err = binary.Write(w, BYTE_ORDER, t.Type)
+	if err != nil {
+		log.Panic(err)
+	}
+	err = binary.Write(w, BYTE_ORDER, t.ValueLength)
+	if err != nil {
+		log.Panic(err)
+	}
+	for i := 0; i < len(t.Value); i++ {
+		err = binary.Write(w, BYTE_ORDER, t.Value[i])
+		if err != nil {
+			log.Panic(err)
+		}
+		totalWritten += binary.Size(t.Value[i])
+	}
+	err = binary.Write(w, BYTE_ORDER, t.Row)
+	if err != nil {
+		log.Panic(err)
+	}
+	err = binary.Write(w, BYTE_ORDER, t.Column)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	totalWritten += binary.Size(t.TotalLength)
+	totalWritten += binary.Size(t.ID)
+	totalWritten += binary.Size(t.Type)
+	totalWritten += binary.Size(t.Row)
+	totalWritten += binary.Size(t.Column)
+	log.Printf("Wrote token to disk; %d bytes", totalWritten)
+	return totalWritten
 }
 
 func UnmarshallToken(data []byte) (Token, error) {
 	var t Token
 	var err error
 
-	n, err := binary.Decode(data, binary.BigEndian, &t.TotalLength)
+	n, err := binary.Decode(data, BYTE_ORDER, &t.TotalLength)
 	data = data[n:]
 	fmt.Printf("Length: %d\n", t.TotalLength)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	n, err = binary.Decode(data, binary.BigEndian, &t.ID)
+	n, err = binary.Decode(data, BYTE_ORDER, &t.ID)
 	data = data[n:]
 	fmt.Printf("ID: %d\n", t.ID)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	n, err = binary.Decode(data, binary.BigEndian, &t.Type)
+	n, err = binary.Decode(data, BYTE_ORDER, &t.Type)
 	data = data[n:]
 	fmt.Printf("Type: %d\n", t.Type)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	n, err = binary.Decode(data, binary.BigEndian, &t.ValueLength)
+	n, err = binary.Decode(data, BYTE_ORDER, &t.ValueLength)
 	data = data[n:]
 	fmt.Printf("Value length: %d\n", t.ValueLength)
 	if err != nil {
@@ -129,14 +160,14 @@ func UnmarshallToken(data []byte) (Token, error) {
 	data = data[t.ValueLength:]
 	fmt.Printf("Value: %v\n", string(t.Value))
 
-	n, err = binary.Decode(data, binary.BigEndian, &t.Row)
+	n, err = binary.Decode(data, BYTE_ORDER, &t.Row)
 	data = data[n:]
 	fmt.Printf("Row: %d\n", t.Row)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	n, err = binary.Decode(data, binary.BigEndian, &t.Column)
+	n, err = binary.Decode(data, BYTE_ORDER, &t.Column)
 	fmt.Printf("Column: %d\n", t.Column)
 	if err != nil {
 		log.Fatal(err)
@@ -153,7 +184,7 @@ func ReadToken(data []byte) (Token, error) {
 	b = b.DecodeU16(&t.TotalLength)
 	b = b.DecodeU8(&t.ID)
 	b = b.DecodeTokenType(&t.Type)
-	b = b.DecodeByte(&t.ValueLength)
+	b = b.DecodeU16(&t.ValueLength)
 	t.Value = make([]byte, t.ValueLength)
 	b = b.DecodeByteArray(t.Value)
 	b = b.DecodeU32(&t.Row)

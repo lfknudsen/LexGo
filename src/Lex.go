@@ -83,31 +83,32 @@ func ReadSpecs(filename string) (*Ruleset, error) {
 	}
 	ruleset := new(Ruleset)
 
-	//ruleString := `(?m)^\s*(?<COMMENT_BLOCK>/\*(?:[^*][^/])*\*/)|(?<COMMENT_LINE>#[^\n])|(?:(?P<ID>\S+)[\s&^\n]+(?P<REGEX>(?:[^\n]*\S))[\s&^\n]*)$`
-	//ruleRegexp := regexp.MustCompile(ruleString)
+	// ruleString := `(?m)^\s*(?<COMMENT_BLOCK>/\*(?:[^*][^/])*\*/)|(?<COMMENT_LINE>#[^\n])|(?:(?P<ID>\S+)[\s&^\n]+(?P<REGEX>(?:[^\n]*\S))[\s&^\n]*)$`
+	// ruleRegexp := regexp.MustCompile(ruleString)
 	regex := LoadRegex("Expressions/ReadRulesheet.txt")
 	match := regex.FindSubmatchIndex(contents)
 	for i := 1; match != nil; i++ {
 		leftID, rightID := regex.Group(ID, match)
-		//log.Printf("ID indices %d, %d.\n", leftID, rightID)
+		// log.Printf("ID indices %d, %d.\n", leftID, rightID)
 		leftRegexp, rightRegexp := regex.Group(REGEX, match)
-		//log.Printf("Regex indices %d, %d.\n", leftRegexp, rightRegexp)
+		leftEncoding, rightEncoding := regex.Group(ENCODING, match) // Optional
+		// log.Printf("Regex indices %d, %d.\n", leftRegexp, rightRegexp)
 		if leftID == rightID || leftRegexp == rightRegexp {
 			left, right := regex.Group(COMMENT_BLOCK, match)
-			//log.Printf("Comment block indices %d, %d.\n", left, right)
+			// log.Printf("Comment block indices %d, %d.\n", left, right)
 			if left != -1 && left != right {
 				contents = contents[right:]
 			} else {
 				left, right = regex.Group(COMMENT_LINE, match)
-				//log.Printf("Comment line indices %d, %d.\n", left, right)
+				// log.Printf("Comment line indices %d, %d.\n", left, right)
 				if left != -1 && left != right {
-					//log.Printf("Content length: %d\n", len(contents))
+					// log.Printf("Content length: %d\n", len(contents))
 					contents = contents[right:]
 				} else {
 					left, right = regex.Group(MISTAKE, match)
-					//log.Printf("Mistake indices %d, %d.\n", left, right)
+					// log.Printf("Mistake indices %d, %d.\n", left, right)
 					if left != -1 && left != right {
-						//log.Printf("Error on row %d, columns %d-%d. The term '%v' could not be recognised.",
+						// log.Printf("Error on row %d, columns %d-%d. The term '%v' could not be recognised.",
 						//	i, left, right, string(contents[left:right]))
 						contents = contents[right:]
 					} else {
@@ -119,8 +120,9 @@ func ReadSpecs(filename string) (*Ruleset, error) {
 		} else {
 			log.Printf("Successfully found a pair on row %d\n", i)
 			id := string(contents[leftID:rightID])
+			en := string(contents[leftEncoding:rightEncoding])
 			re := string(contents[leftRegexp : rightRegexp-1]) // Trimming away newline
-			_ = ruleset.Add(NewRule(id, re))
+			_ = ruleset.Add(NewEncodedRule(id, re, en))
 			fmt.Printf("ID: %v, Regex: %v\n", id, re)
 			contents = contents[rightRegexp:]
 		}

@@ -57,20 +57,22 @@ func (re *Regex) FindSubmatchIndex(b []byte) []int {
 	return re.src.FindSubmatchIndex(b)
 }
 
-func (re *Regex) FindAllSubmatchIndex(b []byte) [][]int {
-	return re.src.FindAllSubmatchIndex(b, -1)
+func (re *Regex) FindAllSubmatchIndex(b *[]byte) [][]int {
+	return re.src.FindAllSubmatchIndex(*b, -1)
 }
 
 func (re *Regex) FindReaderSubmatchIndex(r io.RuneReader) []int {
 	return re.src.FindReaderSubmatchIndex(r)
 }
 
-// eGroupNames is an enum for the named capture groups in the expression.
+// eGroupNames is an enum for the named capture groups in the expression which
+// reads the rule file.
 type eGroupNames string
 
 const (
 	ID            eGroupNames = "ID"
 	REGEX         eGroupNames = "REGEX"
+	ENCODING      eGroupNames = "ENCODING"
 	COMMENT_BLOCK eGroupNames = "COMMENT_BLOCK"
 	COMMENT_LINE  eGroupNames = "COMMENT_LINE"
 	MISTAKE       eGroupNames = "MISTAKE"

@@ -1,0 +1,1 @@
+(?m)(?:\s*)(?<COMMENT_BLOCK>/\*(?:.|\n)*?\*/)|(?<COMMENT_LINE>#[^\n]*$)|^(?:(?P<ID>[^\s]+)\s*(?P<REGEX>(?:.+)+)\s*)|(?<MISTAKE>[^\s\n]+)[^\S\n]*$

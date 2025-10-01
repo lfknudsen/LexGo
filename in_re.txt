@@ -1,0 +1,1 @@
+(?m)\s*(?<PKG>package)|(?<TYPE>type)|(?<STRUCT>struct)|(?<STRING>"(?:(?:(?:(?:\\")|[^"])|\s)*[^\\])?")|(?<STRING_SINGLE>'(?:(?:(?:(?:\\')|[^'])|\s)*[^\\])?')|(?<STRING_BACK>`(?:(?:(?:(?:\\`)|[^`])|\s)*[^\\])?`)|(?<IDENT>\p{L}+)|(?<LBRace>{)|(?<RBRACE>})|(?:\s+)|(?<MISTAKE>.)(?:[^\\]+)

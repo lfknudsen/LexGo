@@ -1,0 +1,17 @@
+# This is a single-line comment.
+PKG             package
+TYPE            type
+STRUCT          struct
+/* This is a multi-line comment :)
+The strings below look complex, and that's because they are.
+Without negative lookbehind, they have to be :( */
+STRING          "(?:(?:(?:(?:\\")|[^"])|\s)*[^\\])?"
+STRING_SINGLE   '(?:(?:(?:(?:\\')|[^'])|\s)*[^\\])?'
+STRING_BACK     `(?:(?:(?:(?:\\`)|[^`])|\s)*[^\\])?`
+IDENT           \p{L}+
+LBRace          {
+RBRACE          }
+/* ?: instead of a name means the regex will not be captured.
+ So the output of the following will be (?:\s+) */
+?:              \s+
+MISTAKE         .+

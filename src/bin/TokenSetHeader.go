@@ -6,11 +6,13 @@ import (
 	"log"
 	"unsafe"
 
+	"github.com/lfknudsen/golib/src/structs"
+
 	"LexGo/src"
 )
 
 type TokenSetHeader struct {
-	Version        [3]byte
+	Version        structs.Version
 	TokenCount     uint32
 	FilenameLength uint16
 	Filename       []rune

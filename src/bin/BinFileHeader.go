@@ -4,13 +4,14 @@ import (
 	"encoding/binary"
 	"io"
 	"log"
+	"github.com/lfknudsen/golib/src/structs"
 
 	"LexGo/src"
 )
 
 type FileHeader struct {
 	Sentinel         [4]byte
-	Version          [3]byte
+	Version          structs.Version
 	TokenSetCount    uint16
 	TokenSetHeaderSz uint8
 }

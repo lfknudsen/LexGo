@@ -11,6 +11,7 @@ import (
 
 	"LexGo/src"
 	"LexGo/src/bin"
+	"LexGo/src/regex"
 )
 
 const Name = "LexGo"
@@ -27,13 +28,13 @@ func OpenCodeFile(filename string) {
 	}
 	fmt.Printf("About to compile...\n")
 	re := regexp.MustCompile(string(regexFile))
-	regex := src.NewRegex(re)
-	tokens := Lex(regex, &code)
+	rex := regex.NewRegex(re)
+	tokens := Lex(rex, &code)
 	tokenset := bin.NewTokenSet(tokens, filename)
 	bin.Write(tokenset, filename+"_out.txt")
 }
 
-func Lex(regex *src.Regex, code *[]byte) *[]src.Token {
+func Lex(regex *regex.Regex, code *[]byte) *[]src.Token {
 	ruleset := src.Decompile(regex.Src())
 	if ruleset == nil {
 		log.Panic("Ruleset is nil")

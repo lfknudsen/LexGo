@@ -9,6 +9,8 @@ import (
 	"path"
 	"strconv"
 	"strings"
+
+	"LexGo/src/regex"
 )
 
 type tok struct {
@@ -85,27 +87,27 @@ func ReadSpecs(filename string) (*Ruleset, error) {
 
 	// ruleString := `(?m)^\s*(?<COMMENT_BLOCK>/\*(?:[^*][^/])*\*/)|(?<COMMENT_LINE>#[^\n])|(?:(?P<ID>\S+)[\s&^\n]+(?P<REGEX>(?:[^\n]*\S))[\s&^\n]*)$`
 	// ruleRegexp := regexp.MustCompile(ruleString)
-	regex := LoadRegex("Expressions/ReadRulesheet.txt")
-	match := regex.FindSubmatchIndex(contents)
+	rex := regex.LoadRegex("Expressions/ReadRulesheet.txt")
+	match := rex.FindSubmatchIndex(contents)
 	for i := 1; match != nil; i++ {
-		leftID, rightID := regex.Group(ID, match)
+		leftID, rightID := rex.Group(regex.ID, match)
 		// log.Printf("ID indices %d, %d.\n", leftID, rightID)
-		leftRegexp, rightRegexp := regex.Group(REGEX, match)
-		leftEncoding, rightEncoding := regex.Group(ENCODING, match) // Optional
+		leftRegexp, rightRegexp := rex.Group(regex.REGEX, match)
+		leftEncoding, rightEncoding := rex.Group(regex.ENCODING, match) // Optional
 		// log.Printf("Regex indices %d, %d.\n", leftRegexp, rightRegexp)
 		if leftID == rightID || leftRegexp == rightRegexp {
-			left, right := regex.Group(COMMENT_BLOCK, match)
+			left, right := rex.Group(regex.COMMENT_BLOCK, match)
 			// log.Printf("Comment block indices %d, %d.\n", left, right)
 			if left != -1 && left != right {
 				contents = contents[right:]
 			} else {
-				left, right = regex.Group(COMMENT_LINE, match)
+				left, right = rex.Group(regex.COMMENT_LINE, match)
 				// log.Printf("Comment line indices %d, %d.\n", left, right)
 				if left != -1 && left != right {
 					// log.Printf("Content length: %d\n", len(contents))
 					contents = contents[right:]
 				} else {
-					left, right = regex.Group(MISTAKE, match)
+					left, right = rex.Group(regex.MISTAKE, match)
 					// log.Printf("Mistake indices %d, %d.\n", left, right)
 					if left != -1 && left != right {
 						// log.Printf("Error on row %d, columns %d-%d. The term '%v' could not be recognised.",
@@ -126,7 +128,7 @@ func ReadSpecs(filename string) (*Ruleset, error) {
 			fmt.Printf("ID: %v, Regex: %v\n", id, re)
 			contents = contents[rightRegexp:]
 		}
-		match = regex.FindSubmatchIndex(contents)
+		match = rex.FindSubmatchIndex(contents)
 	}
 	fmt.Println(ruleset.String())
 	return ruleset, nil

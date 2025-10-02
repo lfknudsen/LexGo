@@ -1,4 +1,4 @@
-package src
+package regex
 
 import (
 	"io"

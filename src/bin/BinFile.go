@@ -29,6 +29,16 @@ func NewBinFile(tokenSet ...TokenSet) *File {
 }
 
 func (b *File) Write(w io.Writer) (totalWritten int) {
+	if src.WRITE_BOM {
+		BOM := []byte("\uFEFF")
+		n, err := w.Write(BOM)
+		if err != nil {
+			return 0
+		}
+		if n != len(BOM) {
+			return 0
+		}
+	}
 	headerN := b.Header.Write(w)
 	log.Printf("Wrote binary file header to disk; %d bytes.\n", headerN)
 	return headerN + b.Content.Write(w)

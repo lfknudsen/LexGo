@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"LexGo/src"
+	"LexGo/src/bin"
 	"LexGo/template"
 )
 
@@ -49,7 +50,8 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Printf("%s\n", f)
-	template.OpenCodeFile("code.txt")
+	tokenFile := template.OpenCodeFile("code.txt")
+	bin.AcceptTokens(tokenFile)
 	// regexp := regexp.MustCompile(string(f))
 
 }

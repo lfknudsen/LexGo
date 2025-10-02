@@ -40,11 +40,33 @@ func (h *FileHeader) Write(w io.Writer) (totalWritten int) {
 
 func DecompileBinHeader(r io.Reader) *FileHeader {
 	var output FileHeader
-	buffer := make([]byte, binary.Size(FileHeader{}))
-	_, err := r.Read(buffer)
+
+	BOM := make([]byte, 3)
+	_, err := r.Read(BOM)
 	if err != nil {
 		log.Panic(err)
 	}
+	foundBom := false
+	if BOM[0] == 0xFF && BOM[1] == 0xFE {
+		src.ToggleByteOrder()
+		foundBom = true
+	} else if BOM[0] == 0xFE && BOM[1] == 0xFF {
+		foundBom = true
+	}
+
+	sizeOfHeaderRemaining := binary.Size(FileHeader{})
+	if foundBom {
+		sizeOfHeaderRemaining -= len(BOM)
+	}
+	buffer := make([]byte, sizeOfHeaderRemaining)
+	_, err = r.Read(buffer)
+	if err != nil {
+		log.Panic(err)
+	}
+	if foundBom {
+		buffer = append(BOM, buffer...)
+	}
+
 	_, err = binary.Decode(buffer, src.BYTE_ORDER, &output)
 	if err != nil {
 		log.Panic(err)
@@ -57,17 +79,19 @@ func (h *FileHeader) Print() {
 }
 
 func (h *FileHeader) PrintTo(w io.Writer) {
-	line1 := fmt.Sprintf("# Sentinel: %s | Version: %s",
-		h.Sentinel, h.Version.String())
-	line2 := fmt.Sprintf("# Token sets: %d | Token set header size (bytes): %d\n",
+	line1 := fmt.Sprintf("# Sentinel: %c%c%c%c | Version: %s",
+		rune(h.Sentinel[0]), rune(h.Sentinel[1]), rune(h.Sentinel[2]), rune(h.Sentinel[3]),
+		h.Version.String())
+	line2 := fmt.Sprintf("# Token sets:  %d | Token set header size (bytes): %d",
 		h.TokenSetCount, h.TokenSetHeaderSz)
 	borderLength := max(len(line1), len(line2)) + 2
 	lineDifference := maths.Abs(len(line1) - len(line2))
-	padding := strings.Repeat(" ", lineDifference+1)
+	padding := strings.Repeat(" ", lineDifference)
 	line1 += padding
-	line1 += " #"
-	line2 += " #"
-	border := bytes.Repeat([]byte{'#'}, borderLength)
+	line1 += " #\n"
+	line2 += " #\n"
+	border := bytes.Repeat([]byte{'#'}, borderLength+1)
+	border[borderLength] = byte('\n')
 	_, _ = w.Write(border)
 	_, _ = w.Write([]byte(line1))
 	_, _ = w.Write([]byte(line2))

@@ -1,4 +1,6 @@
-github.com/lfknudsen/golib v0.0.0-20251002125845-65113230a860 h1:XGRoCdywS+Tys6PHKOwO8L1j0BHeweXrTw7LcJwBOGM=
-github.com/lfknudsen/golib v0.0.0-20251002125845-65113230a860/go.mod h1:dVK0msmnYcw0EDnqRB/hThpXgp/vMGHUbu9sZAwamXc=
-github.com/lfknudsen/golib v0.0.0-20251002143649-4ee05891e612 h1:Psmi/BsguTFgrWJwlNy99hv11MEPBHBQkx5f4G/00u0=
-github.com/lfknudsen/golib v0.0.0-20251002143649-4ee05891e612/go.mod h1:l1J/oClIR9p9RRePQvPlviZc8jcgKWnMbWKfqFZPjYs=
+github.com/lfknudsen/golib v0.0.0-20251002162319-94ef7f6ac44d h1:sJS9yWfgiCIorl7cqLfZJwByvvOsOUaHvRzlFZ7XJKk=
+github.com/lfknudsen/golib v0.0.0-20251002162319-94ef7f6ac44d/go.mod h1:l1J/oClIR9p9RRePQvPlviZc8jcgKWnMbWKfqFZPjYs=
+github.com/lfknudsen/golib v0.0.0-20251002194923-fcc77459b4f2 h1:qc1L4KOqswD59X+sQyxVdVY3UWBNR4jSC2QO9T+lYs0=
+github.com/lfknudsen/golib v0.0.0-20251002194923-fcc77459b4f2/go.mod h1:l1J/oClIR9p9RRePQvPlviZc8jcgKWnMbWKfqFZPjYs=
+github.com/lfknudsen/golib v0.0.5 h1:tDSVItbATU93zYqqW7AAMSylJSQ9FnrYVz4IyLrEot0=
+github.com/lfknudsen/golib v0.0.5/go.mod h1:l1J/oClIR9p9RRePQvPlviZc8jcgKWnMbWKfqFZPjYs=

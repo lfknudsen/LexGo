@@ -3,6 +3,7 @@ package bin
 import (
 	"io"
 	"log"
+	"os"
 
 	"LexGo/src"
 )
@@ -36,4 +37,15 @@ func (ts *TokenSet) Write(w io.Writer) (totalWritten int) {
 	log.Printf("Finished writing tokenset tokens. Wrote %d bytes (excl. header).\n",
 		totalWritten)
 	return headerN + totalWritten
+}
+
+func (ts *TokenSet) Print() {
+	ts.PrintTo(os.Stdout)
+}
+
+func (ts *TokenSet) PrintTo(out io.Writer) {
+	ts.Header.PrintTo(out)
+	for _, token := range ts.Tokens {
+		token.PrintTo(out)
+	}
 }

@@ -2,8 +2,10 @@ package bin
 
 import (
 	"encoding/binary"
+	"fmt"
 	"io"
 	"log"
+	"os"
 	"unsafe"
 
 	"github.com/lfknudsen/golib/src/structs"
@@ -48,4 +50,13 @@ func (h *TokenSetHeader) Write(w io.Writer) (bytesWritten int) {
 	n := WriteRuneArray(w, h.Filename)
 	log.Printf("Wrote %d bytes for the token set filename.\n", n)
 	return n + n4
+}
+
+func (h *TokenSetHeader) Print() {
+	h.PrintTo(os.Stdout)
+}
+
+func (h *TokenSetHeader) PrintTo(out io.Writer) {
+	_, _ = fmt.Fprintf(out, "# Version: %s | Tokens: %d\n", h.Version.String(), h.TokenCount)
+	_, _ = fmt.Fprintf(out, "# Source: %s\n", string(h.Filename))
 }

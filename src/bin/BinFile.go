@@ -68,6 +68,16 @@ func Write(tokenSet *TokenSet, filename string) {
 	}(outputFile)
 }
 
+func (b *File) Print() {
+	b.Header.PrintTo(os.Stdout)
+	b.Content.PrintTo(os.Stdout)
+}
+
+func (b *File) PrintTo(out io.Writer) {
+	b.Header.PrintTo(out)
+	b.Content.PrintTo(out)
+}
+
 func EncodeRuneArray(runes []rune) []byte {
 	flatSize := 0
 	for i := 0; i < len(runes); i++ {

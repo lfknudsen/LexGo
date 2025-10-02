@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
 	"reflect"
 	"strconv"
 )
@@ -193,3 +194,13 @@ func ReadToken(data []byte) (Token, error) {
 }
 
 type TokenType uint8
+
+func (t *Token) Print() {
+	t.PrintTo(os.Stdout)
+}
+
+func (t *Token) PrintTo(out io.Writer) {
+	_, _ = fmt.Fprintf(out, "ID: %d; Type: %d; Value:\n", t.ID, t.Type)
+	_, _ = fmt.Fprintf(out, "%s\n", t.Value)
+	// Will always output as string, which will be wrong for integer-types!
+}

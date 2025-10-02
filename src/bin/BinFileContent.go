@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"io"
 	"log"
+	"os"
 
 	"LexGo/src"
 )
@@ -33,4 +34,14 @@ func DecompileBinContent(r io.Reader) *FileContent {
 		log.Panic(err)
 	}
 	return &output
+}
+
+func (c *FileContent) Print() {
+	c.PrintTo(os.Stdout)
+}
+
+func (c *FileContent) PrintTo(out io.Writer) {
+	for _, tokenSet := range *c {
+		tokenSet.PrintTo(out)
+	}
 }

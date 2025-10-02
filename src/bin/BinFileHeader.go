@@ -1,9 +1,15 @@
 package bin
 
 import (
+	"bytes"
 	"encoding/binary"
+	"fmt"
 	"io"
 	"log"
+	"os"
+	"strings"
+
+	"github.com/lfknudsen/golib/src/maths"
 	"github.com/lfknudsen/golib/src/structs"
 
 	"LexGo/src"
@@ -44,4 +50,26 @@ func DecompileBinHeader(r io.Reader) *FileHeader {
 		log.Panic(err)
 	}
 	return &output
+}
+
+func (h *FileHeader) Print() {
+	h.PrintTo(os.Stdout)
+}
+
+func (h *FileHeader) PrintTo(w io.Writer) {
+	line1 := fmt.Sprintf("# Sentinel: %s | Version: %s",
+		h.Sentinel, h.Version.String())
+	line2 := fmt.Sprintf("# Token sets: %d | Token set header size (bytes): %d\n",
+		h.TokenSetCount, h.TokenSetHeaderSz)
+	borderLength := max(len(line1), len(line2)) + 2
+	lineDifference := maths.Abs(len(line1) - len(line2))
+	padding := strings.Repeat(" ", lineDifference+1)
+	line1 += padding
+	line1 += " #"
+	line2 += " #"
+	border := bytes.Repeat([]byte{'#'}, borderLength)
+	_, _ = w.Write(border)
+	_, _ = w.Write([]byte(line1))
+	_, _ = w.Write([]byte(line2))
+	_, _ = w.Write(border)
 }

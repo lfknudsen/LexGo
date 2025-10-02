@@ -5,6 +5,9 @@ import (
 	"os"
 )
 
+// AcceptTokens reads back the binary file-format the rest of the application saves its
+// output to. It thus exists more for the purposes of testing, providing an example of
+// use, and of verification of correctness than necessarily utility.
 func AcceptTokens(filename string) {
 	file, err := os.Open(filename)
 	if err != nil {
@@ -16,6 +19,6 @@ func AcceptTokens(filename string) {
 			log.Panic(err)
 		}
 	}(file)
-
-	_ = DecompileBinFile(file)
+	bin := DecompileBinFile(file)
+	bin.Print()
 }

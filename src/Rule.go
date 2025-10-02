@@ -22,26 +22,26 @@ func NewRule(id string, regex string) *Rule {
 	return &rule
 }
 
-func (pair *Rule) String() string {
-	return pair.Id + " -> " + pair.regex.String()
+func (r *Rule) String() string {
+	return r.Id + " -> " + r.regex.String()
 }
 
-func (pair *Rule) MatchString(str string) bool {
-	return pair.regex.MatchString(str)
+func (r *Rule) MatchString(str string) bool {
+	return r.regex.MatchString(str)
 }
 
-func (pair *Rule) CompileToString() string {
-	if pair.Id == "?:" {
-		return fmt.Sprintf("(?:%v)", pair.regex.String())
+func (r *Rule) CompileToString() string {
+	if r.Id == "?:" {
+		return fmt.Sprintf("(?:%v)", r.regex.String())
 	}
-	return fmt.Sprintf("(?<%v>%v)", pair.Id, pair.regex.String())
+	return fmt.Sprintf("(?<%v>%v)", r.Id, r.regex.String())
 }
 
-func (pair *Rule) Compile() *regexp.Regexp {
-	return regexp.MustCompile(pair.CompileToString())
+func (r *Rule) Compile() *regexp.Regexp {
+	return regexp.MustCompile(r.CompileToString())
 }
 
-var Encoding map[string]reflect.Kind = map[string]reflect.Kind{
+var Encoding = map[string]reflect.Kind{
 	"char":       reflect.Uint8,
 	"string":     reflect.String,
 	"bool":       reflect.Bool,

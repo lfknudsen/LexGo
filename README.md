@@ -7,7 +7,7 @@ It produces a binary file as output.
 
 ## Ruleset format
 
-The ruleset format is described within the included `ruleset.txt` (slightly truncated here):
+The ruleset format is described within the included example `ruleset.txt` (slightly truncated here):
 
 ```
 /* Each line below is a separate rule.
@@ -51,45 +51,63 @@ MISTAKE(string)             .+
 ## Binary output format
 
 The format is described below. Naturally, this programme is able to decode this format
-itself; feel free to look at the source code for inspiration.
+itself; feel free to look at the source code for inspiration.\
+The binary file contains a header and an array of "Token Sets". Each *Token Set* represents
+a file (or translation unit, or however you wish to use/think of it), which 
+contains an array of *Tokens*.
 
+Below, I've preceded each line with one or two characters to conceptually categorise them (this does not
+indicate how they were implemented, nor the author's opinions of how they ought to be);
 ```
-BOM (2 bytes); 0xFEFF if read as correct endianness; reader should switch if read as 0xFFFE
-File Header (12 bytes)
-File Content (Array of Token Sets)
-```
-
-```
-File Header:
-Sentinel (5 bytes): L E X G O
-Version (3 bytes): <major> <minor> <patch>
-TokenSetCount (4 bytes, signed integer); Number of Token Sets in the File Content.
-```
-
-```
-Token Set:
-Token Set Header
-Tokens (array, each element represents a Token)
+ >  Struct/class
+ +  Primitive value
+:>  Array of structs/classes
+:+  Array of primitive values
 ```
 
-```
-Token Set Header:
-Version (3 bytes): <major> <minor> <patch>
-Token count (4 bytes, unsigned integer)
-Filename Length (2 bytes, unsigned integer)
-Filename (byte array, not zero-terminated, number of elements contained in Filename Length).
-```
+### Binary File
 
 ```
-Token:
-Total Length (2 bytes, unsigned integer); number of bytes in this token 
+ + BOM (2 bytes); 0xFEFF if read as correct endianness; reader should switch if read as 0xFFFE
+ > File Header (12 bytes)
+:> File Content (Array of Token Sets)
+```
+
+#### Binary File Header
+
+```
+:+ Sentinel (5 bytes, ASCII characters; note that they are not zero-terminated): L E X G O
+:+ Version (3 bytes. Semantic versioning. Each an unsigned integer): <major> <minor> <patch>
+ + TokenSetCount (4 bytes, signed integer); Number of *Token Sets* in the File Content.
+```
+
+#### Token Set
+
+```
+ > Token Set Header
+:> Tokens (array, each element represents a Token)
+```
+
+##### Token Set Header
+
+```
+:+ Version (3 bytes): <major> <minor> <patch>
+ + Token count (4 bytes, unsigned integer): Number of *Tokens* in this Token Set.
+ + Filename Length (2 bytes, unsigned integer)
+:+ Filename (byte array, not zero-terminated, number of elements contained in Filename Length).
+```
+
+##### Token
+
+```
+ + Total Length (2 bytes, unsigned integer); number of bytes in this token 
     (including the total length)
-ID (1 byte): 0 = first rule in ruleset, 1 = second rule, and so on...
-Type (1 byte, unsigned integer): Undefined.
-Value Length (2 bytes, unsigned integer): Length of the byte array which contains the
+ + ID (1 byte): 0 = first rule in ruleset, 1 = second rule, and so on...
+ + Type (1 byte, unsigned integer): Undefined.
+ + Value Length (2 bytes, unsigned integer): Length of the byte array which contains the
     actual text which succesfully matched against a rule.
-Value (byte array, not zero-terminated, number of elements is equal to value of Value Length).
+:+ Value (byte array, not zero-terminated, number of elements is equal to value of Value Length).
     This is encoded as plaintext.
-Row (4 bytes, unsigned integer); the row for the first character of the token.
-Column (4 bytes, unsigned integer); the column for the first character of the token.
+ + Row (4 bytes, unsigned integer); the row for the first character of the token.
+ + Column (4 bytes, unsigned integer); the column for the first character of the token.
 ```

@@ -204,3 +204,35 @@ func (t *Token) PrintTo(out io.Writer) {
 	_, _ = fmt.Fprintf(out, "%s\n", t.Value)
 	// Will always output as string, which will be wrong for integer-types!
 }
+
+func DecompileToken(r io.Reader) *Token {
+	var t Token
+	var err error
+	err = binary.Read(r, BYTE_ORDER, &t.TotalLength)
+	if err != nil {
+		log.Panic(err)
+	}
+	err = binary.Read(r, BYTE_ORDER, &t.ID)
+	if err != nil {
+		log.Panic(err)
+	}
+	err = binary.Read(r, BYTE_ORDER, &t.Type)
+	if err != nil {
+		log.Panic(err)
+	}
+	err = binary.Read(r, BYTE_ORDER, &t.ValueLength)
+	if err != nil {
+		log.Panic(err)
+	}
+	fmt.Printf("Value length: %d\n", t.ValueLength)
+	t.Value = make([]byte, t.ValueLength)
+	for i := 0; i < int(t.ValueLength); i++ {
+		err = binary.Read(r, BYTE_ORDER, &t.Value[i])
+		if err != nil {
+			log.Panic(err)
+		}
+	}
+	err = binary.Read(r, BYTE_ORDER, &t.Row)
+	err = binary.Read(r, BYTE_ORDER, &t.Column)
+	return &t
+}

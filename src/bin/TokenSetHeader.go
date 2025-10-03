@@ -16,7 +16,7 @@ import (
 type TokenSetHeader struct {
 	Version        structs.Version
 	TokenCount     uint32
-	FilenameLength uint16
+	FilenameLength uint16 // in bytes
 	Filename       []rune
 }
 
@@ -59,4 +59,49 @@ func (h *TokenSetHeader) Print() {
 func (h *TokenSetHeader) PrintTo(out io.Writer) {
 	_, _ = fmt.Fprintf(out, "# Version: %s | Tokens: %d\n", h.Version.String(), h.TokenCount)
 	_, _ = fmt.Fprintf(out, "# Source: %s\n", string(h.Filename))
+}
+
+func DecompileTokenSetHeader(r io.Reader, TokenSetHeaderSz uint8) *TokenSetHeader {
+	version, err := structs.DecompileVersion(r)
+	if err != nil {
+		log.Panic(err)
+	}
+	var tokenCount uint32
+	buffer := make([]byte, unsafe.Sizeof(tokenCount))
+	_, err = r.Read(buffer)
+	if err != nil {
+		log.Panic(err)
+	}
+	_, err2 := binary.Decode(buffer, src.BYTE_ORDER, &tokenCount)
+	if err2 != nil {
+		log.Panic(err2)
+	}
+
+	var filenameLength uint16
+	buffer = make([]byte, unsafe.Sizeof(filenameLength))
+	_, err = r.Read(buffer)
+	if err != nil {
+		log.Panic(err)
+	}
+	_, err = binary.Decode(buffer, src.BYTE_ORDER, &filenameLength)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	buffer = make([]byte, filenameLength)
+	filename := make([]rune, filenameLength)
+	_, err = r.Read(buffer)
+	if err != nil {
+		log.Panic(err)
+	}
+	_, err = binary.Decode(buffer, src.BYTE_ORDER, &filename)
+	if err != nil {
+		log.Panic(err)
+	}
+	return &TokenSetHeader{
+		Version:        *version,
+		TokenCount:     tokenCount,
+		FilenameLength: filenameLength,
+		Filename:       filename,
+	}
 }

@@ -1,12 +1,9 @@
 package bin
 
 import (
-	"encoding/binary"
 	"io"
 	"log"
 	"os"
-
-	"LexGo/src"
 )
 
 type FileContent []TokenSet
@@ -22,16 +19,10 @@ func (c *FileContent) Write(w io.Writer) (totalWritten int) {
 	return totalWritten
 }
 
-func DecompileBinContent(r io.Reader) *FileContent {
-	var output FileContent
-	buffer := make([]byte, binary.Size(FileContent{}))
-	_, err := r.Read(buffer)
-	if err != nil {
-		log.Panic(err)
-	}
-	_, err = binary.Decode(buffer, src.BYTE_ORDER, &output)
-	if err != nil {
-		log.Panic(err)
+func DecompileBinContent(r io.Reader, header FileHeader) *FileContent {
+	output := make(FileContent, header.TokenSetCount)
+	for i := 0; i < len(output); i++ {
+		output[i] = *DecompileTokenSet(r, header.TokenSetHeaderSz)
 	}
 	return &output
 }

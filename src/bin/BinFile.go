@@ -2,6 +2,7 @@ package bin
 
 import (
 	"encoding/binary"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -38,6 +39,7 @@ func (b *File) Write(w io.Writer) (totalWritten int) {
 		if n != len(BOM) {
 			return 0
 		}
+		fmt.Printf("Wrote %d bytes\n", n)
 	}
 	headerN := b.Header.Write(w)
 	log.Printf("Wrote binary file header to disk; %d bytes.\n", headerN)
@@ -115,7 +117,8 @@ func WriteRuneArray(w io.Writer, runes []rune) (bytesWritten int) {
 
 func DecompileBinFile(r io.Reader) *File {
 	header := DecompileBinHeader(r)
-	content := DecompileBinContent(r)
+	header.Print()
+	content := DecompileBinContent(r, *header)
 	output := File{*header, *content}
 	return &output
 }

@@ -13,13 +13,6 @@ import (
 	"LexGo/src/regex"
 )
 
-type tok struct {
-	ID     string
-	Value  string
-	Row    uint32
-	Column uint32
-}
-
 func Lex(filename string) (resultingFilename string) {
 	ruleset, err := ReadSpecs(filename)
 	if err != nil {

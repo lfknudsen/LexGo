@@ -49,3 +49,12 @@ func (ts *TokenSet) PrintTo(out io.Writer) {
 		token.PrintTo(out)
 	}
 }
+
+func DecompileTokenSet(r io.Reader, TokenSetHeaderSz uint8) *TokenSet {
+	header := DecompileTokenSetHeader(r, TokenSetHeaderSz)
+	var tokens []src.Token
+	for i := 0; i < int(header.TokenCount); i++ {
+		tokens = append(tokens, *src.DecompileToken(r))
+	}
+	return &TokenSet{*header, tokens}
+}

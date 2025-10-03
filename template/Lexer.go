@@ -9,14 +9,14 @@ import (
 	"reflect"
 	"regexp"
 
-	"LexGo/src"
-	"LexGo/src/bin"
-	"LexGo/src/regex"
+	. "LexGo/src"
+	. "LexGo/src/bin"
+	. "LexGo/src/regex"
 )
 
 const Name = "LexGo"
 
-func OpenCodeFile(filename string) {
+func OpenCodeFile(filename string) (outputFilename string) {
 	code, err := os.ReadFile(filename)
 	if err != nil {
 		log.Fatal(err)
@@ -28,14 +28,26 @@ func OpenCodeFile(filename string) {
 	}
 	fmt.Printf("About to compile...\n")
 	re := regexp.MustCompile(string(regexFile))
-	rex := regex.NewRegex(re)
-	tokens := Lex(rex, &code)
-	tokenset := bin.NewTokenSet(tokens, filename)
-	bin.Write(tokenset, filename+"_out.txt")
+	rex := NewRegex(re)
+	tokens := LexTokens(rex, &code)
+	tokenset := NewTokenSet(tokens, filename)
+	outputFilename = filename + "_out.txt"
+	Write(tokenset, outputFilename)
+	return outputFilename
 }
 
-func Lex(regex *regex.Regex, code *[]byte) *[]src.Token {
-	ruleset := src.Decompile(regex.Src())
+// ReadTokens generates an array of src.Token structs from the given regular expression,
+// matched against the given byte-array. Convenience function which calls [LexTokens].
+func ReadTokens(regexp *regexp.Regexp, code *[]byte) *[]Token {
+	return LexTokens(NewRegex(regexp), code)
+}
+
+// LexTokens generates an array of src.Token structs from the given regular expression,
+// matched against the given byte-array.
+//
+//goland:noinspection GoBoolExpressions
+func LexTokens(regex *Regex, code *[]byte) *[]Token {
+	ruleset := Decompile(regex.Src())
 	if ruleset == nil {
 		log.Panic("Ruleset is nil")
 	}
@@ -46,9 +58,9 @@ func Lex(regex *regex.Regex, code *[]byte) *[]src.Token {
 		fmt.Printf("%d: %s\n", idx, name)
 	}
 
-	var tokenIDs []string = make([]string, 0)
-	var values []string = make([]string, 0)
-	tokens := make([]src.Token, 0)
+	var tokenIDs = make([]string, 0)
+	var values = make([]string, 0)
+	tokens := make([]Token, 0)
 
 	fmt.Println("Beginning matching.")
 	matches := regex.FindAllSubmatchIndex(code)
@@ -64,13 +76,13 @@ func Lex(regex *regex.Regex, code *[]byte) *[]src.Token {
 			left, right := match[idx*2], match[idx*2+1]
 			if left != -1 && left != right {
 				value := (*code)[left:right]
-				token := src.Token{
+				token := Token{
 					ID:    byte(i),
 					Value: make([]byte, 0),
 				}
-				if rule.Encoding == reflect.Int {
+				if COMPRESS_ENCODING && rule.Encoding == reflect.Int {
 					n, err := binary.Encode(token.Value,
-						src.BYTE_ORDER,
+						BYTE_ORDER,
 						BytesToInt(value))
 					if err != nil {
 						log.Fatal(err)

@@ -1,9 +1,7 @@
 package bin
 
 import (
-	"fmt"
 	"io"
-	"log"
 	"os"
 
 	"LexGo/src/tokens"
@@ -18,13 +16,11 @@ func NewFileContent(tokenSets []tokens.TokenSet) FileContent {
 }
 
 func (c *FileContent) Write(w io.Writer) (totalWritten int) {
-	log.Printf("Writing binary file contents to disk.\n")
 	totalWritten = 0
 	length := len(c.TokenSets)
 	for i := 0; i < length; i++ {
 		totalWritten += c.TokenSets[i].Write(w)
 	}
-	log.Printf("Wrote binary file contents to disk; %d bytes.\n", totalWritten)
 	return totalWritten
 }
 
@@ -32,7 +28,6 @@ func DecompileBinContent(r io.Reader, header FileHeader) FileContent {
 	content := FileContent{}
 	content.TokenSets = make([]tokens.TokenSet, header.TokenSetCount)
 	length := len(content.TokenSets)
-	fmt.Printf("TokenSet array length: %d\n", length)
 	for i := 0; i < length; i++ {
 		content.TokenSets[i] = tokens.DecompileTokenSet(r)
 	}

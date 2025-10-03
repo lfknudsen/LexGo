@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"log"
 	"os"
 
 	"LexGo/src"
@@ -13,12 +11,7 @@ import (
 func main() {
 	args := os.Args[1:]
 	if len(args) < 1 {
-		filename := src.CompileRulesetRegex("ruleset.txt")
-		f, err := os.ReadFile(filename)
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Printf("Contents of file with compiled regexp:\n%s\n", f)
+		_ = src.CompileRulesetRegex("ruleset.txt")
 		tokenFile := template.OpenCodeFile("code.txt")
 		bin.AcceptTokens(tokenFile)
 		return

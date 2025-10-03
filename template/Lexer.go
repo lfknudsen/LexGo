@@ -1,7 +1,6 @@
 package template
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"regexp"
@@ -46,12 +45,6 @@ func LexTokens(regex *Regex, code *[]byte) *[]Token {
 	if ruleset == nil {
 		log.Panic("Ruleset is nil")
 	}
-	names := ruleset.Names()
-
-	for idx, name := range *names {
-		fmt.Printf("%d: %s\n", idx, name)
-	}
-
 	var tokenIDs = make([]string, 0)
 	var values = make([]string, 0)
 	tokens := make([]Token, 0)

@@ -1,7 +1,6 @@
 package bin
 
 import (
-	"fmt"
 	"log"
 	"os"
 )
@@ -10,6 +9,7 @@ import (
 // output to. It thus exists more for the purposes of testing and example than necessarily utility.
 func AcceptTokens(filename string) {
 	file, err := os.Open(filename)
+
 	if err != nil {
 		log.Panic(err)
 	}
@@ -19,7 +19,7 @@ func AcceptTokens(filename string) {
 			log.Panic(err)
 		}
 	}(file)
+
 	bin := DecompileBinFile(file)
-	fmt.Printf("Decoded the binary file:\n")
 	bin.Print()
 }

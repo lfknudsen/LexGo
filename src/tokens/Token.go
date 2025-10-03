@@ -75,7 +75,6 @@ func (t *Token) Write(w io.Writer) (bytesWritten int) {
 	totalWritten += binary.Size(t.Type)
 	totalWritten += binary.Size(t.Row)
 	totalWritten += binary.Size(t.Column)
-	log.Printf("Wrote token to disk; %d bytes", totalWritten)
 	return totalWritten
 }
 
@@ -86,7 +85,7 @@ func (t *Token) Print() {
 }
 
 func (t *Token) PrintTo(out io.Writer) {
-	_, _ = fmt.Fprintf(out, "ID: %d; Type: %d; Value length: %d\nValue: %s\n",
+	_, _ = fmt.Fprintf(out, "ID: %d; Type: %d; Value length: %d; Value: %s\n",
 		t.ID, t.Type, t.ValueLength, t.Value)
 }
 
@@ -109,7 +108,6 @@ func DecompileToken(r io.Reader) Token {
 	if err != nil {
 		log.Panic(err)
 	}
-	fmt.Printf("Value length: %d\n", t.ValueLength)
 	t.Value = make([]byte, t.ValueLength)
 	for i := 0; i < int(t.ValueLength); i++ {
 		err = binary.Read(r, config.BYTE_ORDER, &t.Value[i])

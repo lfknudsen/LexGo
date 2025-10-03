@@ -89,10 +89,8 @@ func DecompileBOM(r io.Reader) (fileBOM BOM) {
 		log.Panic(err)
 	}
 	if bom.IsReversed() {
-		fmt.Printf("Found bom. Current endianness is reversed. Switching.\n")
 		config.ToggleByteOrder()
 	} else if bom.IsCorrect() {
-		fmt.Printf("Found bom. Current endianness is true.\n")
 	} else {
 		log.Panicf("Did not find bom at start of file.\n")
 	}

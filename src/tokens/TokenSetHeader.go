@@ -66,13 +66,11 @@ func DecompileTokenSetHeader(r io.Reader) TokenSetHeader {
 		log.Panic(err)
 	}
 	ts.Version = *version
-	fmt.Printf("Token set version: %v\n", ts.Version.String())
 
-	err2 := binary.Read(r, config.BYTE_ORDER, &ts.TokenCount)
-	if err2 != nil {
-		log.Panic(err2)
+	err = binary.Read(r, config.BYTE_ORDER, &ts.TokenCount)
+	if err != nil {
+		log.Panic(err)
 	}
-	fmt.Printf("Token count: %d\n", ts.TokenCount)
 
 	err = binary.Read(r, config.BYTE_ORDER, &ts.FilenameLength)
 	if err != nil {

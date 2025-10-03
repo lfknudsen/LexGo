@@ -6,9 +6,9 @@ import (
 	"os"
 	"strings"
 
-	"LexGo/src"
 	"LexGo/src/bin"
 	"LexGo/src/config"
+	"LexGo/src/rules"
 	"LexGo/template"
 )
 
@@ -16,14 +16,14 @@ func main() {
 	// Simple example of compiling rules, lexing code file, encoding tokens to binary,
 	// and finally decoding and printing the binary file's contents.
 	if len(os.Args) == 1 {
-		_ = src.CompileRulesetRegex(config.RULESET)
+		_ = rules.CompileRulesetRegex(config.RULESET)
 		tokenFile := template.LexCodeFiles("code.txt")
 		bin.AcceptTokens(tokenFile)
 		return
 	}
 	args := os.Args[1:]
 	files := HandleCommandLineArguments(args)
-	_ = src.CompileRulesetRegex(config.RULESET)
+	_ = rules.CompileRulesetRegex(config.RULESET)
 	_ = template.LexCodeFiles(files...)
 	return
 }
@@ -87,15 +87,6 @@ func HandleConcatenatedOption(argument rune) error {
 		config.BYTE_ORDER = binary.LittleEndian
 	case 'b':
 		config.BYTE_ORDER = binary.BigEndian
-	/*
-		case 't':
-			config.OUTPUT_FORMAT = config.TOML
-		case 'j':
-			config.OUTPUT_FORMAT = config.JSON
-		case 'y':
-			config.OUTPUT_FORMAT = config.YAML
-		case 'x':
-			config.OUTPUT_FORMAT = config.XML*/
 	case 'p':
 		config.OUTPUT_FORMAT = config.PLAINTEXT
 	default:
@@ -129,15 +120,6 @@ func HandleSingleOption(argument, subsequent string) (usedSubsequent bool, err e
 		switch subsequent {
 		case "bin", "binary", "b": // default is binary
 			config.OUTPUT_FORMAT = config.BINARY
-		/*
-			case "toml", "t":
-				config.OUTPUT_FORMAT = config.TOML
-			case "json", "j":
-				config.OUTPUT_FORMAT = config.JSON
-			case "yaml", "yml", "y":
-				config.OUTPUT_FORMAT = config.YAML
-			case "xml", "x":
-				config.OUTPUT_FORMAT = config.XML */
 		case "plain", "plaintext", "text", "p":
 			config.OUTPUT_FORMAT = config.PLAINTEXT
 		default:

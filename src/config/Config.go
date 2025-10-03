@@ -36,10 +36,6 @@ type OUT_FORMAT uint8
 
 const (
 	BINARY OUT_FORMAT = iota
-	TOML
-	JSON
-	YAML
-	XML
 	PLAINTEXT
 )
 

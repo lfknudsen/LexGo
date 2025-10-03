@@ -5,10 +5,10 @@ import (
 	"os"
 	"regexp"
 
-	. "LexGo/src"
 	. "LexGo/src/bin"
 	"LexGo/src/config"
 	. "LexGo/src/regex"
+	. "LexGo/src/rules"
 	. "LexGo/src/tokens"
 )
 

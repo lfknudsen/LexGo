@@ -1,30 +1,42 @@
 package bin
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os"
+
+	"LexGo/src/tokens"
 )
 
-type FileContent []TokenSet
+type FileContent struct {
+	TokenSets []tokens.TokenSet
+}
+
+func NewFileContent(tokenSets []tokens.TokenSet) FileContent {
+	return FileContent{TokenSets: tokenSets}
+}
 
 func (c *FileContent) Write(w io.Writer) (totalWritten int) {
 	log.Printf("Writing binary file contents to disk.\n")
 	totalWritten = 0
-	for i := 0; i < len(*c); i++ {
-		n := (*c)[i].Write(w)
-		totalWritten += n
+	length := len(c.TokenSets)
+	for i := 0; i < length; i++ {
+		totalWritten += c.TokenSets[i].Write(w)
 	}
 	log.Printf("Wrote binary file contents to disk; %d bytes.\n", totalWritten)
 	return totalWritten
 }
 
-func DecompileBinContent(r io.Reader, header FileHeader) *FileContent {
-	output := make(FileContent, header.TokenSetCount)
-	for i := 0; i < len(output); i++ {
-		output[i] = *DecompileTokenSet(r, header.TokenSetHeaderSz)
+func DecompileBinContent(r io.Reader, header FileHeader) FileContent {
+	content := FileContent{}
+	content.TokenSets = make([]tokens.TokenSet, header.TokenSetCount)
+	length := len(content.TokenSets)
+	fmt.Printf("TokenSet array length: %d\n", length)
+	for i := 0; i < length; i++ {
+		content.TokenSets[i] = tokens.DecompileTokenSet(r)
 	}
-	return &output
+	return content
 }
 
 func (c *FileContent) Print() {
@@ -32,7 +44,7 @@ func (c *FileContent) Print() {
 }
 
 func (c *FileContent) PrintTo(out io.Writer) {
-	for _, tokenSet := range *c {
+	for _, tokenSet := range c.TokenSets {
 		tokenSet.PrintTo(out)
 	}
 }

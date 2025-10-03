@@ -1,60 +1,52 @@
 package bin
 
 import (
-	"encoding/binary"
-	"fmt"
 	"io"
 	"log"
 	"os"
-	"unsafe"
 
-	"LexGo/src"
+	"LexGo/src/config"
+	"LexGo/src/tokens"
 )
 
 type File struct {
+	BOM     BOM
 	Header  FileHeader
 	Content FileContent
 }
 
-func NewBinFile(tokenSet ...TokenSet) *File {
+func NewBinFile(tokenSets []tokens.TokenSet) *File {
 	result := File{}
-	result.Header = FileHeader{
-		Sentinel:         src.SENTINEL,
-		Version:          src.VERSION,
-		TokenSetCount:    uint16(len(tokenSet)),
-		TokenSetHeaderSz: uint8(unsafe.Sizeof(TokenSetHeader{})),
-	}
-	result.Content = tokenSet
+	result.BOM = NewBOM()
+	result.Header = NewFileHeader(config.SENTINEL, config.VERSION, int32(len(tokenSets)))
+	result.Content = NewFileContent(tokenSets)
 	log.Printf("Created binary file structure.\n")
 	return &result
 }
 
 func (b *File) Write(w io.Writer) (totalWritten int) {
-	if src.WRITE_BOM {
-		BOM := []byte("\uFEFF")
-		n, err := w.Write(BOM)
-		if err != nil {
-			return 0
-		}
-		if n != len(BOM) {
-			return 0
-		}
-		fmt.Printf("Wrote %d bytes\n", n)
-	}
+	n := b.BOM.Write(w)
+	log.Printf("Wrote %d bytes for BOM.\n", n)
 	headerN := b.Header.Write(w)
 	log.Printf("Wrote binary file header to disk; %d bytes.\n", headerN)
-	return headerN + b.Content.Write(w)
+	contentN := b.Content.Write(w)
+	log.Printf("Wrote binary file content to disk; %d bytes.\n", contentN)
+	return n + headerN + contentN
 }
 
-func Write(tokenSet *TokenSet, filename string) {
+func Write(tokenSets []tokens.TokenSet, filename string) {
 	outputFile, err := os.Create(filename)
 	if err != nil {
 		log.Panic(err)
 	}
 	log.Printf("Created output file: %v.\n", filename)
-	// writer := bufio.NewWriter(outputFile)
-	bin := NewBinFile(*tokenSet)
+
+	bin := NewBinFile(tokenSets)
+
+	bin.Print()
+
 	n := bin.Write(outputFile)
+
 	log.Printf("Finished writing binary file to disk; %d bytes.\n", n)
 
 	defer func(outputFile *os.File) {
@@ -71,8 +63,8 @@ func Write(tokenSet *TokenSet, filename string) {
 }
 
 func (b *File) Print() {
-	b.Header.PrintTo(os.Stdout)
-	b.Content.PrintTo(os.Stdout)
+	b.Header.Print()
+	b.Content.Print()
 }
 
 func (b *File) PrintTo(out io.Writer) {
@@ -80,45 +72,11 @@ func (b *File) PrintTo(out io.Writer) {
 	b.Content.PrintTo(out)
 }
 
-func EncodeRuneArray(runes []rune) []byte {
-	flatSize := 0
-	for i := 0; i < len(runes); i++ {
-		flatSize += binary.Size(runes[i])
-	}
-
-	output := make([]byte, flatSize)
-	offset := 0
-	for i := 0; i < len(runes); i++ {
-		n, err := binary.Encode(output[offset:], src.BYTE_ORDER, runes[i])
-		if err != nil {
-			log.Panic(err)
-		}
-		offset += n
-	}
-	return output
-}
-
-func WriteRuneArray(w io.Writer, runes []rune) (bytesWritten int) {
-	buffer := make([]byte, 4) // rune size
-	totalWritten := 0
-	for i := 0; i < len(runes); i++ {
-		n, err := binary.Encode(buffer, src.BYTE_ORDER, runes[i])
-		if err != nil {
-			log.Panic(err)
-		}
-		n, err = w.Write(buffer[0:n])
-		if err != nil {
-			log.Panic(err)
-		}
-		totalWritten += n
-	}
-	return totalWritten
-}
-
 func DecompileBinFile(r io.Reader) *File {
+	BOM := DecompileBOM(r)
 	header := DecompileBinHeader(r)
 	header.Print()
-	content := DecompileBinContent(r, *header)
-	output := File{*header, *content}
+	content := DecompileBinContent(r, header)
+	output := File{BOM, header, content}
 	return &output
 }

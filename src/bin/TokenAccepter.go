@@ -1,6 +1,7 @@
 package bin
 
 import (
+	"fmt"
 	"log"
 	"os"
 )
@@ -19,5 +20,6 @@ func AcceptTokens(filename string) {
 		}
 	}(file)
 	bin := DecompileBinFile(file)
+	fmt.Printf("Decoded the binary file:\n")
 	bin.Print()
 }

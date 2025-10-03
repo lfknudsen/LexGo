@@ -1,4 +1,4 @@
-package src
+package tokens
 
 import (
 	"bytes"
@@ -9,6 +9,8 @@ import (
 	"os"
 	"reflect"
 	"strconv"
+
+	"LexGo/src/config"
 )
 
 type Token struct {
@@ -33,7 +35,7 @@ func (t *Token) Equals(other Token) bool {
 
 func NewToken(id byte, typ TokenType, value any, filename string, row int, col int) Token {
 	buffer := make([]byte, binary.Size(value))
-	n, err := binary.Encode(buffer, BYTE_ORDER, value)
+	n, err := binary.Encode(buffer, config.BYTE_ORDER, value)
 	if err != nil {
 		panic(err)
 	}
@@ -51,7 +53,7 @@ func NewToken(id byte, typ TokenType, value any, filename string, row int, col i
 		Column:      uint32(col),
 	}
 
-	var fields []reflect.StructField = reflect.VisibleFields(reflect.TypeOf(t))
+	var fields = reflect.VisibleFields(reflect.TypeOf(t))
 	for _, field := range fields {
 		fmt.Println(field.Name + ": " + field.Type.String() + ". Size:" +
 			strconv.FormatUint(uint64(field.Type.Size()), 10))
@@ -70,48 +72,48 @@ func (t *Token) String() string {
 func (t *Token) Marshall() []byte {
 	bs := make([]byte, t.TotalLength)
 	var buffer = bytes.NewBuffer(bs)
-	_ = binary.Write(buffer, BYTE_ORDER, t.TotalLength)
-	_ = binary.Write(buffer, BYTE_ORDER, t.ID)
-	_ = binary.Write(buffer, BYTE_ORDER, t.Type)
-	_ = binary.Write(buffer, BYTE_ORDER, t.ValueLength)
+	_ = binary.Write(buffer, config.BYTE_ORDER, t.TotalLength)
+	_ = binary.Write(buffer, config.BYTE_ORDER, t.ID)
+	_ = binary.Write(buffer, config.BYTE_ORDER, t.Type)
+	_ = binary.Write(buffer, config.BYTE_ORDER, t.ValueLength)
 	for i := 0; i < len(t.Value); i++ {
-		_ = binary.Write(buffer, BYTE_ORDER, t.Value[i])
+		_ = binary.Write(buffer, config.BYTE_ORDER, t.Value[i])
 	}
-	_ = binary.Write(buffer, BYTE_ORDER, t.Row)
-	_ = binary.Write(buffer, BYTE_ORDER, t.Column)
+	_ = binary.Write(buffer, config.BYTE_ORDER, t.Row)
+	_ = binary.Write(buffer, config.BYTE_ORDER, t.Column)
 	return buffer.Bytes()
 }
 
 func (t *Token) Write(w io.Writer) (bytesWritten int) {
 	totalWritten := 0
-	err := binary.Write(w, BYTE_ORDER, t.TotalLength)
+	err := binary.Write(w, config.BYTE_ORDER, t.TotalLength)
 	if err != nil {
 		log.Panic(err)
 	}
-	err = binary.Write(w, BYTE_ORDER, t.ID)
+	err = binary.Write(w, config.BYTE_ORDER, t.ID)
 	if err != nil {
 		log.Panic(err)
 	}
-	err = binary.Write(w, BYTE_ORDER, t.Type)
+	err = binary.Write(w, config.BYTE_ORDER, t.Type)
 	if err != nil {
 		log.Panic(err)
 	}
-	err = binary.Write(w, BYTE_ORDER, t.ValueLength)
+	err = binary.Write(w, config.BYTE_ORDER, t.ValueLength)
 	if err != nil {
 		log.Panic(err)
 	}
 	for i := 0; i < len(t.Value); i++ {
-		err = binary.Write(w, BYTE_ORDER, t.Value[i])
+		err = binary.Write(w, config.BYTE_ORDER, t.Value[i])
 		if err != nil {
 			log.Panic(err)
 		}
 		totalWritten += binary.Size(t.Value[i])
 	}
-	err = binary.Write(w, BYTE_ORDER, t.Row)
+	err = binary.Write(w, config.BYTE_ORDER, t.Row)
 	if err != nil {
 		log.Panic(err)
 	}
-	err = binary.Write(w, BYTE_ORDER, t.Column)
+	err = binary.Write(w, config.BYTE_ORDER, t.Column)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -129,28 +131,28 @@ func UnmarshallToken(data []byte) (Token, error) {
 	var t Token
 	var err error
 
-	n, err := binary.Decode(data, BYTE_ORDER, &t.TotalLength)
+	n, err := binary.Decode(data, config.BYTE_ORDER, &t.TotalLength)
 	data = data[n:]
 	fmt.Printf("Length: %d\n", t.TotalLength)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	n, err = binary.Decode(data, BYTE_ORDER, &t.ID)
+	n, err = binary.Decode(data, config.BYTE_ORDER, &t.ID)
 	data = data[n:]
 	fmt.Printf("ID: %d\n", t.ID)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	n, err = binary.Decode(data, BYTE_ORDER, &t.Type)
+	n, err = binary.Decode(data, config.BYTE_ORDER, &t.Type)
 	data = data[n:]
 	fmt.Printf("Type: %d\n", t.Type)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	n, err = binary.Decode(data, BYTE_ORDER, &t.ValueLength)
+	n, err = binary.Decode(data, config.BYTE_ORDER, &t.ValueLength)
 	data = data[n:]
 	fmt.Printf("Value length: %d\n", t.ValueLength)
 	if err != nil {
@@ -161,36 +163,20 @@ func UnmarshallToken(data []byte) (Token, error) {
 	data = data[t.ValueLength:]
 	fmt.Printf("Value: %v\n", string(t.Value))
 
-	n, err = binary.Decode(data, BYTE_ORDER, &t.Row)
+	n, err = binary.Decode(data, config.BYTE_ORDER, &t.Row)
 	data = data[n:]
 	fmt.Printf("Row: %d\n", t.Row)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	n, err = binary.Decode(data, BYTE_ORDER, &t.Column)
+	n, err = binary.Decode(data, config.BYTE_ORDER, &t.Column)
 	fmt.Printf("Column: %d\n", t.Column)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	return t, nil
-}
-
-func ReadToken(data []byte) (Token, error) {
-	var t Token
-	var err error
-	b := new(BuffStruct)
-	b.b = data
-	b = b.DecodeU16(&t.TotalLength)
-	b = b.DecodeU8(&t.ID)
-	b = b.DecodeTokenType(&t.Type)
-	b = b.DecodeU16(&t.ValueLength)
-	t.Value = make([]byte, t.ValueLength)
-	b = b.DecodeByteArray(t.Value)
-	b = b.DecodeU32(&t.Row)
-	b = b.DecodeU32(&t.Column)
-	return t, err
 }
 
 type TokenType uint8
@@ -200,39 +186,39 @@ func (t *Token) Print() {
 }
 
 func (t *Token) PrintTo(out io.Writer) {
-	_, _ = fmt.Fprintf(out, "ID: %d; Type: %d; Value:\n", t.ID, t.Type)
-	_, _ = fmt.Fprintf(out, "%s\n", t.Value)
-	// Will always output as string, which will be wrong for integer-types!
+	_, _ = fmt.Fprintf(out, "ID: %d; Type: %d; Value length: %d\nValue: %s\n",
+		t.ID, t.Type, t.ValueLength, t.Value)
+	// Will always output as string, which might be wrong for integer-types!
 }
 
-func DecompileToken(r io.Reader) *Token {
+func DecompileToken(r io.Reader) Token {
 	var t Token
 	var err error
-	err = binary.Read(r, BYTE_ORDER, &t.TotalLength)
+	err = binary.Read(r, config.BYTE_ORDER, &t.TotalLength)
 	if err != nil {
 		log.Panic(err)
 	}
-	err = binary.Read(r, BYTE_ORDER, &t.ID)
+	err = binary.Read(r, config.BYTE_ORDER, &t.ID)
 	if err != nil {
 		log.Panic(err)
 	}
-	err = binary.Read(r, BYTE_ORDER, &t.Type)
+	err = binary.Read(r, config.BYTE_ORDER, &t.Type)
 	if err != nil {
 		log.Panic(err)
 	}
-	err = binary.Read(r, BYTE_ORDER, &t.ValueLength)
+	err = binary.Read(r, config.BYTE_ORDER, &t.ValueLength)
 	if err != nil {
 		log.Panic(err)
 	}
 	fmt.Printf("Value length: %d\n", t.ValueLength)
 	t.Value = make([]byte, t.ValueLength)
 	for i := 0; i < int(t.ValueLength); i++ {
-		err = binary.Read(r, BYTE_ORDER, &t.Value[i])
+		err = binary.Read(r, config.BYTE_ORDER, &t.Value[i])
 		if err != nil {
 			log.Panic(err)
 		}
 	}
-	err = binary.Read(r, BYTE_ORDER, &t.Row)
-	err = binary.Read(r, BYTE_ORDER, &t.Column)
-	return &t
+	err = binary.Read(r, config.BYTE_ORDER, &t.Row)
+	err = binary.Read(r, config.BYTE_ORDER, &t.Column)
+	return t
 }

@@ -1,4 +1,4 @@
-package src
+package config
 
 import (
 	"encoding/binary"
@@ -13,11 +13,11 @@ var BYTE_ORDER binary.ByteOrder = binary.BigEndian
 const WRITE_BOM = true
 
 // VERSION determines the semantic version number output to the token-set header.
-var VERSION = structs.Version{Major: 0, Minor: 0, Patch: 1}
+var VERSION = structs.Version{Major: 0, Minor: 9, Patch: 0}
 
 // SENTINEL is the four bytes which are written first to the binary file (right after the
 // byte order mark)
-var SENTINEL = [4]byte{'L', 'X', 'G', 'O'}
+var SENTINEL = TrueSentinel()
 
 // COMPRESS_ENCODING determines whether to encode integers as integers or as plaintext.
 const COMPRESS_ENCODING = false

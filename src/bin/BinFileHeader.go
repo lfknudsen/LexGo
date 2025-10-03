@@ -12,66 +12,46 @@ import (
 	"github.com/lfknudsen/golib/src/maths"
 	"github.com/lfknudsen/golib/src/structs"
 
-	"LexGo/src"
+	"LexGo/src/config"
 )
 
 type FileHeader struct {
-	Sentinel         [4]byte
-	Version          structs.Version
-	TokenSetCount    uint16
-	TokenSetHeaderSz uint8
+	Sentinel      config.Sentinel
+	Version       structs.Version
+	TokenSetCount int32
+}
+
+func NewFileHeader[T maths.Signed](sentinel config.Sentinel, version structs.Version, tokenCount T) FileHeader {
+	return FileHeader{
+		Sentinel:      sentinel,
+		Version:       version,
+		TokenSetCount: int32(tokenCount),
+	}
 }
 
 func (h *FileHeader) Write(w io.Writer) (totalWritten int) {
-	var buffer []byte = make([]byte, binary.Size(*h))
-	log.Printf("Allocated buffer for binary file header of %d bytes.\n",
-		len(buffer))
-	n, err := binary.Encode(buffer, src.BYTE_ORDER, *h)
+	var buffer = make([]byte, binary.Size(*h))
+	n1, err := binary.Encode(buffer, config.BYTE_ORDER, *h)
 	if err != nil {
 		log.Panic(err)
 	}
-	log.Printf("Encoded binary file header; %d bytes.\n", n)
-	n, err = w.Write(buffer)
+	n2, err := w.Write(buffer)
 	if err != nil {
 		log.Panic(err)
 	}
-	return n
+	if n1 != n2 {
+		log.Panicf("Encoded %d bytes, but wrote %d!\n", n1, n2)
+	}
+	return n2
 }
 
-func DecompileBinHeader(r io.Reader) *FileHeader {
+func DecompileBinHeader(r io.Reader) FileHeader {
 	var output FileHeader
-
-	BOM := make([]byte, 3)
-	_, err := r.Read(BOM)
+	err := binary.Read(r, config.BYTE_ORDER, &output)
 	if err != nil {
 		log.Panic(err)
 	}
-	foundBom := false
-	if BOM[0] == 0xFF && BOM[1] == 0xFE {
-		src.ToggleByteOrder()
-		foundBom = true
-	} else if BOM[0] == 0xFE && BOM[1] == 0xFF {
-		foundBom = true
-	}
-
-	sizeOfHeaderRemaining := binary.Size(FileHeader{})
-	if foundBom {
-		sizeOfHeaderRemaining -= len(BOM)
-	}
-	buffer := make([]byte, sizeOfHeaderRemaining)
-	_, err = r.Read(buffer)
-	if err != nil {
-		log.Panic(err)
-	}
-	if foundBom {
-		buffer = append(BOM, buffer...)
-	}
-
-	_, err = binary.Decode(buffer, src.BYTE_ORDER, &output)
-	if err != nil {
-		log.Panic(err)
-	}
-	return &output
+	return output
 }
 
 func (h *FileHeader) Print() {
@@ -79,15 +59,14 @@ func (h *FileHeader) Print() {
 }
 
 func (h *FileHeader) PrintTo(w io.Writer) {
-	line1 := fmt.Sprintf("# Sentinel: %c%c%c%c | Version: %s",
-		rune(h.Sentinel[0]), rune(h.Sentinel[1]), rune(h.Sentinel[2]), rune(h.Sentinel[3]),
-		h.Version.String())
-	line2 := fmt.Sprintf("# Token sets:  %d | Token set header size (bytes): %d",
-		h.TokenSetCount, h.TokenSetHeaderSz)
+	line1 := fmt.Sprintf("# Sentinel: %s | Version: %s",
+		h.Sentinel.String(), h.Version.String())
+	line2 := fmt.Sprintf("# Token sets:  %d",
+		h.TokenSetCount)
 	borderLength := max(len(line1), len(line2)) + 2
 	lineDifference := maths.Abs(len(line1) - len(line2))
 	padding := strings.Repeat(" ", lineDifference)
-	line1 += padding
+	line2 += padding
 	line1 += " #\n"
 	line2 += " #\n"
 	border := bytes.Repeat([]byte{'#'}, borderLength+1)

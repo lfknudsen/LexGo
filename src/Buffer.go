@@ -1,12 +1,25 @@
 package src
 
-import (
-	"encoding/binary"
-	"fmt"
-	"log"
-	"reflect"
-	"strconv"
-)
+type Buffer struct{}
+
+/*
+
+
+func ReadToken(data []byte) (Token, error) {
+	var t Token
+	var err error
+	b := new(src.BuffStruct)
+	b.b = data
+	b = b.DecodeU16(&t.TotalLength)
+	b = b.DecodeU8(&t.ID)
+	b = b.DecodeTokenType(&t.Type)
+	b = b.DecodeU16(&t.ValueLength)
+	t.Value = make([]byte, t.ValueLength)
+	b = b.DecodeByteArray(t.Value)
+	b = b.DecodeU32(&t.Row)
+	b = b.DecodeU32(&t.Column)
+	return t, err
+}
 
 type Buffer []byte
 
@@ -128,7 +141,7 @@ func (b *BuffStruct) DecodeArray(dst any) *BuffStruct {
 	return b
 }
 
-func (b *BuffStruct) DecodeTokenType(dst *TokenType) *BuffStruct {
+func (b *BuffStruct) DecodeTokenType(dst *tokens.TokenType) *BuffStruct {
 	n, err := binary.Decode(b.b, binary.BigEndian, dst)
 	if err != nil {
 		log.Fatal(err)
@@ -136,3 +149,4 @@ func (b *BuffStruct) DecodeTokenType(dst *TokenType) *BuffStruct {
 	b.b = b.b[n:]
 	return b
 }
+*/

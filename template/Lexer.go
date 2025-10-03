@@ -1,17 +1,15 @@
 package template
 
 import (
-	"encoding/binary"
 	"fmt"
 	"log"
-	"math"
 	"os"
-	"reflect"
 	"regexp"
 
 	. "LexGo/src"
 	. "LexGo/src/bin"
 	. "LexGo/src/regex"
+	. "LexGo/src/tokens"
 )
 
 const Name = "LexGo"
@@ -32,7 +30,7 @@ func OpenCodeFile(filename string) (outputFilename string) {
 	tokens := LexTokens(rex, &code)
 	tokenset := NewTokenSet(tokens, filename)
 	outputFilename = filename + "_out.txt"
-	Write(tokenset, outputFilename)
+	Write([]TokenSet{*tokenset}, outputFilename)
 	return outputFilename
 }
 
@@ -44,8 +42,6 @@ func ReadTokens(regexp *regexp.Regexp, code *[]byte) *[]Token {
 
 // LexTokens generates an array of src.Token structs from the given regular expression,
 // matched against the given byte-array.
-//
-//goland:noinspection GoBoolExpressions
 func LexTokens(regex *Regex, code *[]byte) *[]Token {
 	ruleset := Decompile(regex.Src())
 	if ruleset == nil {
@@ -80,18 +76,9 @@ func LexTokens(regex *Regex, code *[]byte) *[]Token {
 					ID:    byte(i),
 					Value: make([]byte, 0),
 				}
-				if COMPRESS_ENCODING && rule.Encoding == reflect.Int {
-					n, err := binary.Encode(token.Value,
-						BYTE_ORDER,
-						BytesToInt(value))
-					if err != nil {
-						log.Fatal(err)
-					}
-					token.ValueLength = uint16(n)
-				} else {
-					token.Value = value
-					token.ValueLength = uint16(len(value))
-				}
+				token.Value = value
+				token.ValueLength = uint16(len(value))
+
 				values = append(values, string(value))
 				tokenIDs = append(tokenIDs, rule.Id)
 				tokens = append(tokens, token)
@@ -104,32 +91,4 @@ func LexTokens(regex *Regex, code *[]byte) *[]Token {
 		fmt.Println(tokenIDs[i] + ":    " + string(value))
 	}
 	return &tokens
-}
-
-func BytesToInt(buffer []byte) int64 {
-	var number int64 = 0
-	for i := 0; i < len(buffer); i++ {
-		number *= 10
-		number += int64(buffer[i])
-	}
-	return number
-}
-
-func FitsInto(value uint64) reflect.Kind {
-	if value <= math.MaxInt8 {
-		return reflect.Int8
-	}
-	if value <= math.MaxInt16 {
-		return reflect.Int16
-	}
-	if value <= math.MaxInt32 {
-		return reflect.Int32
-	}
-	if value <= math.MaxInt {
-		return reflect.Int
-	}
-	if value <= math.MaxInt64 {
-		return reflect.Int64
-	}
-	return math.MaxUint64
 }

@@ -5,6 +5,8 @@ import (
 	"io"
 	"log"
 	"strings"
+
+	"LexGo/src/config"
 )
 
 func RuneToString(rs []rune) string {
@@ -43,13 +45,13 @@ func WriteByteArray(w io.Writer, in []byte) {
 
 func ReadByteArray(r io.Reader) []byte {
 	var sz int32
-	err := binary.Read(r, binary.BigEndian, &sz)
+	err := binary.Read(r, config.BYTE_ORDER, &sz)
 	if err != nil {
 		log.Panic(err)
 	}
 
 	array := make([]byte, sz)
-	err = binary.Read(r, binary.BigEndian, &array)
+	err = binary.Read(r, config.BYTE_ORDER, &array)
 	if err != nil {
 		log.Panic(err)
 	}

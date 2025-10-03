@@ -1,6 +1,7 @@
 package bin
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -47,7 +48,13 @@ func Write(tokenSets []tokens.TokenSet, filename string) {
 	}(outputFile)
 
 	bin := NewBinFile(tokenSets)
-	_ = bin.Write(outputFile)
+	if config.OUTPUT_FORMAT == config.PLAINTEXT {
+		fmt.Printf("Printing to plaintext.")
+		bin.PrintTo(outputFile)
+	} else {
+		fmt.Printf("Printing to binary.")
+		_ = bin.Write(outputFile)
+	}
 }
 
 func (b *File) Print() {

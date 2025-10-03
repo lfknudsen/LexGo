@@ -14,19 +14,23 @@ import (
 
 const Name = "LexGo"
 
-func LexCodeFiles(filename string) (outputFilename string) {
+func LexCodeFiles(filename ...string) (outputFilename string) {
 	regex := CompileRegex()
+	var tokenSets []TokenSet
 
-	code, err := os.ReadFile(filename)
-	if err != nil {
-		log.Fatal(err)
+	for _, file := range filename {
+		code, err := os.ReadFile(file)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		tokens := LexTokens(regex, &code)
+		tokenSet := NewTokenSet(tokens, file)
+		tokenSets = append(tokenSets, *tokenSet)
 	}
 
-	tokens := LexTokens(regex, &code)
-	tokenset := NewTokenSet(tokens, filename)
-
 	outputFilename = config.OUTPUT_FILENAME
-	Write([]TokenSet{*tokenset}, outputFilename)
+	Write(tokenSets, outputFilename)
 	return outputFilename
 }
 

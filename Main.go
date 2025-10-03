@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/binary"
+	"fmt"
 	"os"
 	"strings"
 
@@ -21,12 +22,18 @@ func main() {
 		return
 	}
 	args := os.Args[1:]
-	HandleCommandLineArguments(args)
+	files := HandleCommandLineArguments(args)
 	_ = src.CompileRulesetRegex(config.RULESET)
+	_ = template.LexCodeFiles(files...)
 	return
 }
 
-func HandleCommandLineArguments(args []string) {
+func HandleCommandLineArguments(args []string) []string {
+	var files []string
+	if len(args) == 2 && args[0] == "decode" {
+		bin.AcceptTokens(args[1])
+		os.Exit(0)
+	}
 	for i := 0; i < len(args); i++ {
 		if args[i][0] == '-' {
 			if i < len(args)-1 {
@@ -43,8 +50,11 @@ func HandleCommandLineArguments(args []string) {
 					os.Exit(1)
 				}
 			}
+		} else {
+			files = append(files, args[i])
 		}
 	}
+	return files
 }
 
 func HandleCommandOption(argument, subsequent string) (usedSubsequent bool, err error) {
@@ -152,5 +162,6 @@ func HandleCommandOptionNoSubsequent(argument string) error {
 }
 
 func PrintHelp() error {
+	fmt.Println("Something went wrong?!")
 	return nil
 }

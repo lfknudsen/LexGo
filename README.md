@@ -1,2 +1,95 @@
 # LexGo
-Simple lexer generator written in Go.
+
+Simple lexer generator (and lexer) written in Go.
+
+It takes two things as input: a **ruleset** and a **code file**.
+It produces a binary file as output.
+
+## Ruleset format
+
+The ruleset format is described within the included `ruleset.txt` (slightly truncated here):
+
+```
+/* Each line below is a separate rule.
+ The format is <name>[(<encoding>)]<whitespace><regexp>.
+ Note that the programme uses Google's RE2 engine, which is slightly limited in
+ functionality in order to maintain O(n) time complexity;
+ This means look-back and look-ahead is _not_ possible.
+
+ The (encoding) information is optional, and currently (as of v0.9.0) does nothing.
+ Rules have higher priority than ones listed below them. If two rules would
+ theoretically match the same text, whichever one is highest will be selected. */
+PKG(string)                 package
+TYPE(string)                type
+STRUCT(string)              struct
+STRING(string)              "(?:(?:(?:(?:\\")|[^"])|\s)*[^\\])?"
+STRING_SINGLE(string)       '(?:(?:(?:(?:\\')|[^'])|\s)*[^\\])?'
+STRING_BACK(string)         `(?:(?:(?:(?:\\`)|[^`])|\s)*[^\\])?`
+IDENT(string)               \p{L}+
+INTEGER(int)                \d+
+FLOAT(float)                \d+(\.\d+)?
+# Remember to escape special symbols if you mean to use them as characters!
+LPAREN(char)                \(
+RPAREN(char)                \)
+LBRace(char)                {
+RBRACE(char)                }
+OP_PLUS(char)               \+
+OP_MINUS(char)              \-
+OP_EQ(char)                 \=
+OP_DEQ(string)              \=\=
+COMMENT_LINE_START(char)    \#
+COMMENT_BLOCK_START(string) \/\*
+/* Some characters can be problematic, and do not follow normal rules of escaping with
+ a backslash. You can enclose them in brackets instead. */
+COMMENT_BLOCK_END(string)   [*][/]
+/* ?: instead of a name means the regex will not be captured, meaning no token will
+ be created based on it. The regex output of the following will be (?:\s+) */
+?:(none)                    \s+
+MISTAKE(string)             .+
+```
+
+## Binary output format
+
+The format is described below. Naturally, this programme is able to decode this format
+itself; feel free to look at the source code for inspiration.
+
+```
+BOM (2 bytes); 0xFEFF if read as correct endianness; reader should switch if read as 0xFFFE
+File Header (12 bytes)
+File Content (Array of Token Sets)
+```
+
+```
+File Header:
+Sentinel (5 bytes): L E X G O
+Version (3 bytes): <major> <minor> <patch>
+TokenSetCount (4 bytes, signed integer); Number of Token Sets in the File Content.
+```
+
+```
+Token Set:
+Token Set Header
+Tokens (array, each element represents a Token)
+```
+
+```
+Token Set Header:
+Version (3 bytes): <major> <minor> <patch>
+Token count (4 bytes, unsigned integer)
+Filename Length (2 bytes, unsigned integer)
+Filename (byte array, not zero-terminated, number of elements contained in Filename Length).
+```
+
+```
+Token:
+Total Length (2 bytes, unsigned integer); number of bytes in this token 
+    (including the total length)
+ID (1 byte): 0 = first rule in ruleset, 1 = second rule, and so on...
+Type (1 byte, unsigned integer): Undefined.
+Value Length (2 bytes, unsigned integer): Length of the byte array which contains the
+    actual text which succesfully matched against a rule.
+Value (byte array, not zero-terminated, number of elements is equal to value of Value Length).
+    This is encoded as plaintext.
+Row (4 bytes, unsigned integer); the row for the first character of the token.
+Column (4 bytes, unsigned integer); the column for the first character of the token.
+```

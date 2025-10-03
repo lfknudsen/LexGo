@@ -1,7 +1,6 @@
 package src
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"regexp"
@@ -104,10 +103,8 @@ func Decompile(rx *regexp.Regexp) *Ruleset {
 		log.Fatal(err)
 	}
 	str := string(bs)
-	fmt.Println("Compiling the regexp for decompiling regexes...")
 	regexOfRegex := regexp.MustCompile(str)
 	searchString := rx.String()
-	// fmt.Println(searchString)
 	matches := regexOfRegex.FindAllStringSubmatchIndex(searchString, -1)
 	if matches == nil {
 		return nil
@@ -115,7 +112,6 @@ func Decompile(rx *regexp.Regexp) *Ruleset {
 
 	rules := make([]Rule, len(matches))
 	rulesCount := 0
-	fmt.Printf("Found %d rules\n", len(matches))
 	for i, match := range matches {
 		if len(match) != 8 {
 			log.Println("Match #" + strconv.Itoa(i) + " has wrong length")
@@ -123,7 +119,7 @@ func Decompile(rx *regexp.Regexp) *Ruleset {
 		}
 		ID := searchString[match[4]:match[5]]
 		RegExp := searchString[match[6]:match[7]]
-		fmt.Printf("Compiling an individual regexp:\n%s: %s\n", ID, RegExp)
+		//fmt.Printf("Compiling an individual regexp:\n%s: %s\n", ID, RegExp)
 		rules[rulesCount] = *NewRule(ID, RegExp)
 		rulesCount++
 	}

@@ -24,7 +24,6 @@ func OpenCodeFile(filename string) (outputFilename string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("About to compile...\n")
 	re := regexp.MustCompile(string(regexFile))
 	rex := NewRegex(re)
 	tokens := LexTokens(rex, &code)
@@ -49,7 +48,6 @@ func LexTokens(regex *Regex, code *[]byte) *[]Token {
 	}
 	names := ruleset.Names()
 
-	fmt.Println("Subexpression names:")
 	for idx, name := range *names {
 		fmt.Printf("%d: %s\n", idx, name)
 	}
@@ -58,7 +56,6 @@ func LexTokens(regex *Regex, code *[]byte) *[]Token {
 	var values = make([]string, 0)
 	tokens := make([]Token, 0)
 
-	fmt.Println("Beginning matching.")
 	matches := regex.FindAllSubmatchIndex(code)
 	for _, match := range matches {
 		for i, rule := range ruleset.Rules {
@@ -85,10 +82,6 @@ func LexTokens(regex *Regex, code *[]byte) *[]Token {
 				break
 			}
 		}
-	}
-	fmt.Println("Result of pattern matching on code text:")
-	for i, value := range values {
-		fmt.Println(tokenIDs[i] + ":    " + string(value))
 	}
 	return &tokens
 }

@@ -4,8 +4,8 @@ import (
 	"log"
 	"os"
 	"path"
-	"strings"
 
+	"LexGo/src/config"
 	"LexGo/src/regex"
 )
 
@@ -17,10 +17,7 @@ func CompileRulesetRegex(filename string) (resultingFilename string) {
 
 	compiled := ruleset.Compile()
 
-	basename := path.Base(filename)
-	ext := path.Ext(basename)
-	name, _ := strings.CutSuffix(basename, ext)
-	outputFilename := path.Join(path.Dir(filename), name+".rx"+ext)
+	outputFilename := path.Join(path.Dir(filename), config.RULESET_REGEX)
 	outputFile, err := os.Create(outputFilename)
 	defer func(outputFile *os.File) {
 		err := outputFile.Close()

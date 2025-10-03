@@ -7,29 +7,37 @@ import (
 
 	. "LexGo/src"
 	. "LexGo/src/bin"
+	"LexGo/src/config"
 	. "LexGo/src/regex"
 	. "LexGo/src/tokens"
 )
 
 const Name = "LexGo"
 
-func OpenCodeFile(filename string) (outputFilename string) {
+func LexCodeFiles(filename string) (outputFilename string) {
+	regex := CompileRegex()
+
 	code, err := os.ReadFile(filename)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	regexFile, err := os.ReadFile("in_re.txt")
+	tokens := LexTokens(regex, &code)
+	tokenset := NewTokenSet(tokens, filename)
+
+	outputFilename = config.OUTPUT_FILENAME
+	Write([]TokenSet{*tokenset}, outputFilename)
+	return outputFilename
+}
+
+func CompileRegex() *Regex {
+	regexFile, err := os.ReadFile(config.RULESET_REGEX)
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	re := regexp.MustCompile(string(regexFile))
-	rex := NewRegex(re)
-	tokens := LexTokens(rex, &code)
-	tokenset := NewTokenSet(tokens, filename)
-	outputFilename = filename + "_out.txt"
-	Write([]TokenSet{*tokenset}, outputFilename)
-	return outputFilename
+	return NewRegex(re)
 }
 
 // ReadTokens generates an array of src.Token structs from the given regular expression,

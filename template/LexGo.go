@@ -11,5 +11,5 @@ func main() {
 		fmt.Println("Usage: go run LexGo.go <filename>")
 		os.Exit(1)
 	}
-	OpenCodeFile(os.Args[1])
+	LexCodeFiles(os.Args[1])
 }

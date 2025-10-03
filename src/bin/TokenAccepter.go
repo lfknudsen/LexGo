@@ -7,6 +7,7 @@ import (
 
 // AcceptTokens reads back the binary file-format the rest of the application saves its
 // output to. It thus exists more for the purposes of testing and example than necessarily utility.
+// It decodes and prints out the contents of the binary file.
 func AcceptTokens(filename string) {
 	file, err := os.Open(filename)
 

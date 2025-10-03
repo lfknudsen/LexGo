@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	filename := src.Lex("in.txt")
+	filename := src.Lex("ruleset.txt")
 	f, err := os.ReadFile(filename)
 	if err != nil {
 		log.Fatal(err)

@@ -144,6 +144,25 @@ func HandleCommandOptionNoSubsequent(argument string) error {
 }
 
 func PrintHelp() error {
-	fmt.Println("Something went wrong?!")
+	fmt.Println(`
+$ ./LexGo <options> <filename(s)>                       Tokenise code file(s) based on a ruleset
+$ ./LexGo decode <filename>                             Pretty print contents of a binary file written by this programme. 
+
+Options:
+    --no-bom  -n                                        Do not use a BOM.
+    --use-bom -u                                        Use a BOM (default)
+    
+    --endian -e     <endianness>                        Set the endianness.
+                    little/little-endian
+                    big/big-endian                      (default)
+                    native/native-endian/machine
+                    
+    --rule -r       <ruleset filename>                  Specify ruleset filename (default is "ruleset.txt")
+    
+    --format -f     <format>                            Choose output format
+                    bin/binary/b
+                    plain/plaintext/text/p
+    
+    --output -o     <output filename>                   Set output filename.`)
 	return nil
 }

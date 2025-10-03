@@ -1,6 +1,6 @@
 # LexGo
 
-Simple lexer generator (and lexer) written in Go.
+Simple lexer (does this count as a lexer generator?) written in Go.
 
 It takes two things as input: a **ruleset** and a **code file**.
 It produces a binary file as output.

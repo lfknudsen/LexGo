@@ -1,9 +1,10 @@
 # LexGo
 
-Simple lexer (does this count as a lexer generator?) written in Go.
+Simple lexer written in Go.
 
-It takes two things as input: a **ruleset** and a **code file**.
-It produces a binary file as output.
+It takes two things as input: a **ruleset** and one or more **code files**.
+It compiles a regular expression based on the rules, and then produces tokens
+by reading the code files. It produces a binary file as output.
 
 ## Usage
 
@@ -11,7 +12,8 @@ Build with `go build`. Then:
 
 ```
 $ ./LexGo <options> <filename(s)>                       Tokenise code file(s) based on a ruleset.
-$ ./LexGo decode <filename>                             Pretty print contents of a binary file written by this programme. 
+$ ./LexGo decode <filename>                             Pretty print contents of a binary
+                                                          file written by this programme. 
 
 Options:
     --no-bom  -n                                        Do not use a BOM.
@@ -22,14 +24,15 @@ Options:
                     big/big-endian                      (default)
                     native/native-endian/machine
                     
-    --rule -r       <ruleset filename>                  Specify ruleset filename (default is "ruleset.txt")
+    --rule -r       <ruleset filename>                  Specify ruleset filename
+                                                          (default is "ruleset.txt")
     
     --format -f     <format>                            Choose output format
                     bin/binary/b
                     plain/plaintext/text/p
     
     --output -o     <output filename>                   Set output filename.
-
+                                                          (default is "out.tok")
 ```
 
 ## Ruleset format

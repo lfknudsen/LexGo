@@ -1,6 +1,6 @@
 # LexGo
 
-Simple lexer generator (and lexer) written in Go.
+Simple lexer and lexer generator written in Go.
 
 It takes two things as input: a **ruleset** and a **code file**.
 It produces a binary file as output.
@@ -32,47 +32,52 @@ Options:
 
 ```
 
+### Example
+
+```
+$ ./LexGo -e big code.txt code2.txt
+```
+
 ## Ruleset format
 
 The ruleset format is described within the included example `ruleset.txt` (slightly truncated here):
 
 ```
 /* Each line below is a separate rule.
- The format is <name>[(<encoding>)]<whitespace><regexp>.
+ The format is <name><whitespace><regexp>.
  Note that the programme uses Google's RE2 engine, which is slightly limited in
  functionality in order to maintain O(n) time complexity;
  This means look-back and look-ahead is _not_ possible.
 
- The (encoding) information is optional, and currently (as of v0.9.0) does nothing.
  Rules have higher priority than ones listed below them. If two rules would
  theoretically match the same text, whichever one is highest will be selected. */
-PKG(string)                 package
-TYPE(string)                type
-STRUCT(string)              struct
-STRING(string)              "(?:(?:(?:(?:\\")|[^"])|\s)*[^\\])?"
-STRING_SINGLE(string)       '(?:(?:(?:(?:\\')|[^'])|\s)*[^\\])?'
-STRING_BACK(string)         `(?:(?:(?:(?:\\`)|[^`])|\s)*[^\\])?`
-IDENT(string)               \p{L}+
-INTEGER(int)                \d+
-FLOAT(float)                \d+(\.\d+)?
+PKG                             package
+TYPE                            type
+STRUCT                          struct
+STRING                          "(?:(?:(?:(?:\\")|[^"])|\s)*[^\\])?"
+STRING_SINGLE                   '(?:(?:(?:(?:\\')|[^'])|\s)*[^\\])?'
+STRING_BACK                     `(?:(?:(?:(?:\\`)|[^`])|\s)*[^\\])?`
+IDENT                           \p{L}+
+INTEGER                         \d+
+FLOAT                           \d+(\.\d+)?
 # Remember to escape special symbols if you mean to use them as characters!
-LPAREN(char)                \(
-RPAREN(char)                \)
-LBRace(char)                {
-RBRACE(char)                }
-OP_PLUS(char)               \+
-OP_MINUS(char)              \-
-OP_EQ(char)                 \=
-OP_DEQ(string)              \=\=
-COMMENT_LINE_START(char)    \#
-COMMENT_BLOCK_START(string) \/\*
+LPAREN                          \(
+RPAREN                          \)
+LBRace                          {
+RBRACE                          }
+OP_PLUS                         \+
+OP_MINUS                        \-
+OP_EQ                           \=
+OP_DEQ                          \=\=
+COMMENT_LINE_START              \#
+COMMENT_BLOCK_START             \/\*
 /* Some characters can be problematic, and do not follow normal rules of escaping with
  a backslash. You can enclose them in brackets instead. */
-COMMENT_BLOCK_END(string)   [*][/]
+COMMENT_BLOCK_END               [*][/]
 /* ?: instead of a name means the regex will not be captured, meaning no token will
  be created based on it. The regex output of the following will be (?:\s+) */
-?:(none)                    \s+
-MISTAKE(string)             .+
+?:(none)                        \s+
+MISTAKE                         .+
 ```
 
 ## Binary output format

@@ -65,7 +65,7 @@ func (b *File) PrintTo(out io.Writer) {
 }
 
 func DecompileBinFile(r io.Reader) *File {
-	BOM := DecompileBOM(r)
+	BOM := DecodeBOM(r)
 	header := DecompileBinHeader(r)
 	content := DecompileBinContent(r, header)
 	output := File{BOM, header, content}

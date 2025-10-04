@@ -27,12 +27,16 @@ import (
 // programme they use - to adjust and understand the contents correctly.
 type BOM uint16
 
+// NewBOM returns a new Byte Order Mark with the correct code point.
 func NewBOM() BOM {
 	return correct
 }
 
-// correct is the true version. This is supposed to be constant!
+// correct is the true version.
 const correct = 0xFEFF
+
+// reversed is the incorrect version. If this is read at the start of a file,
+// the endianness should be switched.
 const reversed = 0xFFFE
 
 func (b BOM) IsCorrect() bool {
@@ -60,10 +64,13 @@ func (b BOM) String() string {
 	return fmt.Sprintf("BOM: %x", strings.ToUpper(str))
 }
 
+// Print is a convenience function for calling PrintTo on the standard output.
 func (b BOM) Print() {
 	b.PrintTo(os.Stdout)
 }
 
+// PrintTo prints text explaining what this BOM indicates regarding the reading order
+// of the text it was read from.
 func (b BOM) PrintTo(out io.Writer) {
 	if b.IsCorrect() {
 		_, _ = fmt.Fprintf(out, "BOM indicates the correct reading order.")
@@ -74,6 +81,7 @@ func (b BOM) PrintTo(out io.Writer) {
 	}
 }
 
+// Write encodes and writes the BOM to a binary format.
 func (b BOM) Write(w io.Writer) (totalWritten int) {
 	err := binary.Write(w, config.BYTE_ORDER, b)
 	if err != nil {
@@ -82,7 +90,9 @@ func (b BOM) Write(w io.Writer) (totalWritten int) {
 	return binary.Size(b)
 }
 
-func DecompileBOM(r io.Reader) (fileBOM BOM) {
+// DecodeBOM reads two bytes, and toggles the endianness going forward accordingly.
+// If a BOM could not be found, it panics.
+func DecodeBOM(r io.Reader) (fileBOM BOM) {
 	var bom BOM
 	err := binary.Read(r, config.BYTE_ORDER, &bom)
 	if err != nil {

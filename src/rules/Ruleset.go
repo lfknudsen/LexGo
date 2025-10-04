@@ -13,10 +13,12 @@ type Ruleset struct {
 	Rules []Rule
 }
 
+// Length returns the number of Rule elements contained in this Ruleset.
 func (rs *Ruleset) Length() int {
 	return len(rs.Rules)
 }
 
+// Names generates an array of the IDs of all the Rule elements in this Ruleset.
 func (rs *Ruleset) Names() *[]string {
 	names := make([]string, len(rs.Rules))
 	for i, r := range rs.Rules {
@@ -25,6 +27,7 @@ func (rs *Ruleset) Names() *[]string {
 	return &names
 }
 
+// String generates a human-readable string of the contents of this Ruleset.
 func (rs *Ruleset) String() string {
 	sb := strings.Builder{}
 	sb.WriteString("-----Rules:-----\n")
@@ -71,6 +74,7 @@ func (rs *Ruleset) AddAll(rules ...Rule) int {
 	return len(rs.Rules)
 }
 
+// AddArray appends each given Rule to the Ruleset, and returns the new length of the Ruleset.
 func (rs *Ruleset) AddArray(rules []Rule) int {
 	for _, rule := range rules {
 		rs.Rules = append(rs.Rules, rule)
@@ -78,6 +82,7 @@ func (rs *Ruleset) AddArray(rules []Rule) int {
 	return len(rs.Rules)
 }
 
+// Remove removes the first Rule with the given name from the Ruleset, and returns the new length.
 func (rs *Ruleset) Remove(id string) int {
 	for i, rule := range rs.Rules {
 		if rule.Id == id {
@@ -88,6 +93,7 @@ func (rs *Ruleset) Remove(id string) int {
 	return len(rs.Rules)
 }
 
+// RemoveAll removes each Rule with the given name in the Ruleset, and returns the new length.
 func (rs *Ruleset) RemoveAll(id string) int {
 	for i, rule := range rs.Rules {
 		if rule.Id == id {
@@ -97,6 +103,8 @@ func (rs *Ruleset) RemoveAll(id string) int {
 	return len(rs.Rules)
 }
 
+// Decompile generates a Ruleset based on a regular expression that was itself
+// generates based on a Ruleset. Note that Encoding information is lost.
 func Decompile(rx *regexp.Regexp) *Ruleset {
 	bs, err := os.ReadFile("Expressions/DecompileRegex.txt")
 	if err != nil {

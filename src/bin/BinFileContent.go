@@ -29,7 +29,7 @@ func DecompileBinContent(r io.Reader, header FileHeader) FileContent {
 	content.TokenSets = make([]tokens.TokenSet, header.TokenSetCount)
 	length := len(content.TokenSets)
 	for i := 0; i < length; i++ {
-		content.TokenSets[i] = tokens.DecompileTokenSet(r)
+		content.TokenSets[i] = tokens.DecompileTokenSet(r, header.Version)
 	}
 	return content
 }

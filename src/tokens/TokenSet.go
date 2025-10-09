@@ -4,7 +4,7 @@ import (
 	"io"
 	"os"
 
-	"LexGo/src/config"
+	"github.com/lfknudsen/golib/src/structs"
 )
 
 type TokenSet struct {
@@ -17,7 +17,6 @@ func NewTokenSet(tokens *[]Token, filename string) *TokenSet {
 	result.Tokens = *tokens
 	name := []byte(filename)
 	result.Header = TokenSetHeader{
-		Version:        config.VERSION,
 		Filename:       name,
 		FilenameLength: uint16(len(name)),
 		TokenCount:     uint32(len(*tokens)),
@@ -44,8 +43,8 @@ func (ts *TokenSet) PrintTo(out io.Writer) {
 	}
 }
 
-func DecompileTokenSet(r io.Reader) TokenSet {
-	header := DecompileTokenSetHeader(r)
+func DecompileTokenSet(r io.Reader, version structs.Version) TokenSet {
+	header := DecompileTokenSetHeader(r, version)
 
 	var tokens = make([]Token, header.TokenCount)
 	length := int(header.TokenCount)

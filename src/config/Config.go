@@ -14,7 +14,7 @@ var BYTE_ORDER binary.ByteOrder = binary.BigEndian
 var USE_BOM = true
 
 // VERSION determines the semantic version number output to the token-set header.
-var VERSION = structs.Version{Major: 0, Minor: 9, Patch: 1}
+var VERSION = structs.Version{Major: 1, Minor: 0, Patch: 1}
 
 // SENTINEL is the five bytes which are written first to the binary file (right after the
 // byte order mark)

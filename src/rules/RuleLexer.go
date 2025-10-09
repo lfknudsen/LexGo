@@ -51,7 +51,6 @@ func ReadSpecs(filename string) (*Ruleset, error) {
 	for i := 1; match != nil; i++ {
 		leftID, rightID := rex.Group(regex.ID, match)
 		leftRegexp, rightRegexp := rex.Group(regex.REGEX, match)
-		leftEncoding, rightEncoding := rex.Group(regex.ENCODING, match) // Optional
 		if leftID == rightID || leftRegexp == rightRegexp {
 			left, right := rex.Group(regex.COMMENT_BLOCK, match)
 			if left != -1 && left != right {
@@ -72,9 +71,8 @@ func ReadSpecs(filename string) (*Ruleset, error) {
 			}
 		} else {
 			id := string(contents[leftID:rightID])
-			en := string(contents[leftEncoding:rightEncoding])
 			re := string(contents[leftRegexp : rightRegexp-1]) // Trimming away newline
-			_ = ruleset.Add(NewEncodedRule(id, re, en))
+			_ = ruleset.Add(NewRule(id, re))
 			contents = contents[rightRegexp:]
 		}
 		match = rex.FindSubmatchIndex(contents)

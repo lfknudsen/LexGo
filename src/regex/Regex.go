@@ -72,7 +72,6 @@ type eGroupNames string
 const (
 	ID            eGroupNames = "ID"
 	REGEX         eGroupNames = "REGEX"
-	ENCODING      eGroupNames = "ENCODING"
 	COMMENT_BLOCK eGroupNames = "COMMENT_BLOCK"
 	COMMENT_LINE  eGroupNames = "COMMENT_LINE"
 	MISTAKE       eGroupNames = "MISTAKE"
